@@ -4,8 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { NATIONAL_BUDGET_2025 } from "@/lib/dashboard-constants"
 
-export function SectoralAllocationChart() {
+import { TrendingUp, Scale } from "lucide-react"
+
+interface Props {
+    trendingData?: {
+        name: string;
+        priorities?: {
+            health: number;
+            education: number;
+            agriculture: number;
+        }
+    }
+}
+
+export function SectoralAllocationChart({ trendingData }: Props) {
     const data = NATIONAL_BUDGET_2025.sectoral_allocation;
+
+    const benchmarkData = [
+        { subject: 'Health', County: trendingData?.priorities?.health || 12, National: 3.22 },
+        { subject: 'Education', County: trendingData?.priorities?.education || 22, National: 16.37 },
+        { subject: 'Agri', County: trendingData?.priorities?.agriculture || 8, National: 1.11 },
+    ];
 
     return (
         <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
@@ -53,7 +72,57 @@ export function SectoralAllocationChart() {
                         </div>
                     ))}
                 </div>
+
+                {/* Integrated Priority Benchmark */}
+                <div className="mt-8 pt-6 border-t border-white/5 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Scale className="h-3.5 w-3.5 text-blue-400" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                                {trendingData?.name || "County"} vs National
+                            </span>
+                        </div>
+                        <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-blue-500/30 text-blue-400 uppercase">Gap Analysis</Badge>
+                    </div>
+
+                    <div className="space-y-4">
+                        {benchmarkData.map((item, i) => (
+                            <div key={i} className="space-y-2">
+                                <div className="flex justify-between items-center text-[10px]">
+                                    <span className="font-bold text-slate-400">{item.subject}</span>
+                                    <div className="flex gap-2">
+                                        <span className="text-accent font-bold">{item.County}%</span>
+                                        <span className="text-slate-600">vs</span>
+                                        <span className="text-slate-500">{item.National}%</span>
+                                    </div>
+                                </div>
+                                <div className="h-1.5 w-full bg-white/[0.03] rounded-full overflow-hidden flex">
+                                    <div
+                                        className="h-full bg-accent relative group-hover:brightness-110 transition-all"
+                                        style={{ width: `${(item.County / (item.County + item.National)) * 100}%` }}
+                                    />
+                                    <div
+                                        className="h-full bg-slate-700 opacity-40"
+                                        style={{ width: `${(item.National / (item.County + item.National)) * 100}%` }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className={`p-2.5 rounded-lg border text-[10px] leading-relaxed ${(trendingData?.priorities?.health || 12) < 15 ? 'bg-red-500/5 border-red-500/10 text-red-400/80' : 'bg-emerald-500/5 border-emerald-500/10 text-emerald-400/80'
+                        }`}>
+                        <div className="flex gap-2">
+                            <TrendingUp className="h-3 w-3 shrink-0" />
+                            <p>
+                                {trendingData?.name || 'Selected county'} shows a **{Math.abs(15 - (trendingData?.priorities?.health || 12))}% variance** in health spend compared to national standards.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </CardContent>
         </Card>
     )
 }
+
+import { Badge } from "@/components/ui/badge"

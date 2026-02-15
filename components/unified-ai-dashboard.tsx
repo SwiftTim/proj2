@@ -28,14 +28,32 @@ interface DashboardData {
         priority: number
     }
     daily_audit: {
-        county_1: { name: string; budgeted: number; actual: number }
-        county_2: { name: string; budgeted: number; actual: number }
+        county_1: {
+            name: string;
+            budgeted: number;
+            actual: number;
+            compliance?: { wage_bill: number; development: number; audit_score: number };
+            priorities?: { health: number; education: number; agriculture: number };
+        }
+        county_2: {
+            name: string;
+            budgeted: number;
+            actual: number;
+            compliance?: { wage_bill: number; development: number; audit_score: number };
+            priorities?: { health: number; education: number; agriculture: number };
+        }
         insight: string
     }
     economic_ticker: string[]
 }
 
-export function UnifiedAIDashboard({ onTickerUpdate }: { onTickerUpdate?: (headlines: string[]) => void }) {
+export function UnifiedAIDashboard({
+    onTickerUpdate,
+    onDataUpdate
+}: {
+    onTickerUpdate?: (headlines: string[]) => void,
+    onDataUpdate?: (data: DashboardData) => void
+}) {
     const [data, setData] = useState<DashboardData | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [isRefreshing, setIsRefreshing] = useState(false)
@@ -60,6 +78,7 @@ export function UnifiedAIDashboard({ onTickerUpdate }: { onTickerUpdate?: (headl
                 }
                 setData(parsedData)
                 if (onTickerUpdate) onTickerUpdate(syncData.economic_ticker)
+                if (onDataUpdate) onDataUpdate(parsedData)
             }
         } catch (error) {
             console.error("Error fetching dashboard data:", error)
@@ -127,18 +146,18 @@ export function UnifiedAIDashboard({ onTickerUpdate }: { onTickerUpdate?: (headl
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Panel: Hot Insights */}
-                <Card className="lg:col-span-1 border-border/50 bg-card/50 backdrop-blur-sm">
-                    <CardHeader className="pb-3 border-b border-border/10">
+                <Card className="lg:col-span-1 border-white/5 bg-card/40 backdrop-blur-xl shadow-2xl">
+                    <CardHeader className="pb-3 border-b border-white/5">
                         <Badge className="w-fit mb-2 bg-accent/10 text-accent border-accent/20">Hot Insights</Badge>
-                        <CardTitle className="text-xl">{data?.hot_insight.topic}</CardTitle>
-                        <CardDescription className="text-sm line-clamp-2">{data?.hot_insight.description}</CardDescription>
+                        <CardTitle className="text-xl font-plus-jakarta tracking-tight">{data?.hot_insight.topic}</CardTitle>
+                        <CardDescription className="text-sm line-clamp-2 leading-relaxed">{data?.hot_insight.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-4 space-y-4">
                         <div className="space-y-3">
                             {data?.hot_insight.deep_dive.map((point, idx) => (
-                                <div key={idx} className="flex gap-3 text-sm">
-                                    <div className="mt-1 h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
-                                    <p className="text-muted-foreground">{point}</p>
+                                <div key={idx} className="flex gap-3 text-sm animate-in fade-in slide-in-from-left-2 duration-300 fill-mode-both" style={{ animationDelay: `${idx * 100}ms` }}>
+                                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-accent shrink-0 shadow-[0_0_8px_rgba(var(--accent-rgb),0.5)]" />
+                                    <p className="text-muted-foreground leading-snug">{point}</p>
                                 </div>
                             ))}
                         </div>
@@ -175,12 +194,13 @@ export function UnifiedAIDashboard({ onTickerUpdate }: { onTickerUpdate?: (headl
                                         dataKey="name"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontWeight: 500 }}
                                     />
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
+                                        tickFormatter={(val) => `KSh ${val}B`}
                                     />
                                     <Tooltip
                                         cursor={{ fill: "hsl(var(--accent))", opacity: 0.05 }}
@@ -196,6 +216,88 @@ export function UnifiedAIDashboard({ onTickerUpdate }: { onTickerUpdate?: (headl
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
+
+                        {/* Fiscal Violation Radar (Idea 1) */}
+                        {data?.daily_audit.county_1.compliance && (
+                            <div className="mt-8 pt-6 border-t border-border/10">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Fiscal Compliance Radar: {data.daily_audit.county_1.name}</h4>
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-1 w-8 bg-emerald-500/20 rounded-full overflow-hidden">
+                                            <div className="h-full bg-emerald-500 w-full animate-pulse" />
+                                        </div>
+                                        <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-tighter">Live Audit Status</span>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-6">
+                                    {/* Wage Bill Check */}
+                                    <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3 hover:bg-white/[0.04] transition-colors group">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Wage Bill</p>
+                                            <div className="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center">
+                                                <TrendingUp className="h-2.5 w-2.5 text-slate-500" />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.wage_bill > 35 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                                {data.daily_audit.county_1.compliance.wage_bill}%
+                                            </span>
+                                            <span className="text-[9px] text-slate-600 font-bold uppercase">/ 35% Limit</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.wage_bill > 35 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                            <p className="text-[9px] text-slate-500 font-medium">
+                                                {data.daily_audit.county_1.compliance.wage_bill > 35 ? 'OVER CEILING' : 'COMPLIANT'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Development Allocation Check */}
+                                    <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3 hover:bg-white/[0.04] transition-colors group">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Development</p>
+                                            <div className="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center">
+                                                <BarChart3 className="h-2.5 w-2.5 text-slate-500" />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.development < 30 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                                                {data.daily_audit.county_1.compliance.development}%
+                                            </span>
+                                            <span className="text-[9px] text-slate-600 font-bold uppercase">/ 30% Floor</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.development < 30 ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                                            <p className="text-[9px] text-slate-500 font-medium">
+                                                {data.daily_audit.county_1.compliance.development < 30 ? 'BELOW TARGET' : 'HEALTHY ALLOCATION'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Audit Health Score */}
+                                    <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3 hover:bg-white/[0.04] transition-colors group">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Audit Score</p>
+                                            <div className="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center">
+                                                <AlertCircle className="h-2.5 w-2.5 text-slate-500" />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.audit_score < 60 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                                {data.daily_audit.county_1.compliance.audit_score}
+                                            </span>
+                                            <span className="text-[9px] text-slate-600 font-bold uppercase">/ 100 Health</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.audit_score < 60 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                            <p className="text-[9px] text-slate-500 font-medium whitespace-nowrap">
+                                                {data.daily_audit.county_1.compliance.audit_score < 60 ? 'FISCAL RISK DETECTED' : 'LOW RISK PROFILE'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <div className="mt-4 p-3 rounded-lg bg-accent/5 border border-accent/10 flex gap-3">
                             <Info className="h-4 w-4 text-accent shrink-0 mt-0.5" />
                             <p className="text-xs text-muted-foreground italic">

@@ -18,7 +18,8 @@ export async function GET() {
         ar.county as analysis_county,
         ar.summary_text,
         ar.revenue as key_metrics,
-        ar.intelligence
+        ar.intelligence,
+        ar.raw_extracted as raw_verified_data
       FROM uploads u
       LEFT JOIN analysis_results ar ON u.id = ar.upload_id
       ORDER BY u.created_at DESC

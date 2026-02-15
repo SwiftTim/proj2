@@ -47,8 +47,9 @@ class HotTakeExtractor:
         
         2. DAILY AUDIT (Comparative performance):
            Select TWO specific Kenyan counties with a notable gap in their OSR (Own Source Revenue) collection performance.
-           - county_1: {name, budgeted, actual} (budgeted and actual MUST be numeric - integers or floats representing KES billions)
-           - county_2: {name, budgeted, actual} (budgeted and actual MUST be numeric - integers or floats representing KES billions)
+           - county_1: {name, budgeted, actual, compliance: {wage_bill: %, development: %, audit_score: /100}, priorities: {health: %, education: %, agriculture: %}} 
+           - county_2: {name, budgeted, actual, compliance: {wage_bill: %, development: %, audit_score: /100}, priorities: {health: %, education: %, agriculture: %}}
+           (budgeted and actual MUST be numeric - integers or floats representing KES billions. compliance and priorities values should be realistic for Kenyan counties)
            - insight: Why this comparison is important today.
         
         3. ECONOMIC TICKER:
@@ -57,7 +58,19 @@ class HotTakeExtractor:
         Format the response as a clean JSON object:
         {
           "hot_insight": { "topic": "", "description": "", "deep_dive": [], "keywords": [], "priority": 9 },
-          "daily_audit": { "county_1": {}, "county_2": {}, "insight": "" },
+          "daily_audit": { 
+            "county_1": { 
+                "name": "", "budgeted": 0.0, "actual": 0.0, 
+                "compliance": {"wage_bill": 0, "development": 0, "audit_score": 0},
+                "priorities": {"health": 0, "education": 0, "agriculture": 0}
+            }, 
+            "county_2": { 
+                "name": "", "budgeted": 0.0, "actual": 0.0, 
+                "compliance": {"wage_bill": 0, "development": 0, "audit_score": 0},
+                "priorities": {"health": 0, "education": 0, "agriculture": 0}
+            }, 
+            "insight": "" 
+          },
           "economic_ticker": ["Headline 1", "Headline 2", "..."]
         }
         """

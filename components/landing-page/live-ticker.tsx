@@ -15,9 +15,25 @@ const getAlertColor = (health: string) => {
 export function LiveTicker() {
   const [alerts, setAlerts] = useState<any[]>([])
 
-  // Function to randomize alerts
-  const refreshAlerts = () => {
-    // Shuffle and pick 10
+  // Function to localize alerts
+  const refreshAlerts = async () => {
+    try {
+      const res = await fetch("/api/landing-data")
+      const data = await res.json()
+      if (data.success && data.trending?.ticker?.length > 0) {
+        const tickerAlerts = data.trending.ticker.map((t: any) => ({
+          type: (t.type || "INFO").toUpperCase(),
+          message: t.text,
+          color: getAlertColor(t.health || "stable")
+        }))
+        setAlerts(tickerAlerts)
+        return
+      }
+    } catch (err) {
+      console.error("Ticker fetch error:", err)
+    }
+
+    // Fallback to randomized local facts
     const shuffled = [...COUNTY_FACTS].sort(() => 0.5 - Math.random())
     const selected = shuffled.slice(0, 10).map(c => ({
       type: c.fiscalHealth.toUpperCase(),
@@ -29,7 +45,7 @@ export function LiveTicker() {
 
   useEffect(() => {
     refreshAlerts() // Initial load
-    const interval = setInterval(refreshAlerts, 120000) // Refresh every 2 mins
+    const interval = setInterval(refreshAlerts, 60000) // Refresh every 1 min
     return () => clearInterval(interval)
   }, [])
 

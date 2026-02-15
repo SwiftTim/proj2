@@ -1,9 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { FileText, TrendingUp, AlertTriangle, CheckCircle, Loader2 } from "lucide-react"
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+}
+
+const item = {
+  hidden: { y: 20, opacity: 0 },
+  show: { y: 0, opacity: 1 }
+}
 
 export function DashboardStats() {
   const [stats, setStats] = useState<any[]>([])
@@ -42,30 +58,38 @@ export function DashboardStats() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+    >
       {stats.map((stat, index) => {
         const Icon = icons[stat.title] || FileText
         return (
-          <Card key={index} className="relative overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-              <Icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-muted-foreground">{stat.description}</p>
-                <Badge
-                  variant={stat.trendUp ? "default" : "destructive"}
-                  className={stat.trendUp ? "bg-chart-2/10 text-chart-2 border-chart-2/20" : ""}
-                >
-                  {stat.trend}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div key={index} variants={item}>
+            <Card className="relative overflow-hidden group hover:border-accent/50 transition-colors duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground font-plus-jakarta tracking-wide">{stat.title}</CardTitle>
+                <Icon className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-foreground font-mono tabular-nums">{stat.value}</div>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-muted-foreground">{stat.description}</p>
+                  <Badge
+                    variant={stat.trendUp ? "default" : "destructive"}
+                    className={stat.trendUp ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : ""}
+                  >
+                    {stat.trend}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

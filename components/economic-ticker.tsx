@@ -34,18 +34,18 @@ export function EconomicTicker({ headlines = [] }: { headlines?: string[] }) {
     }, [headlines])
 
     const defaultHeadlines = [
-        "Analyzing latest CBIRR reports...",
-        "BudgetAI 2.0 Live - Transforming chaotic data into insights",
+        "Analyzing latest CBIRR reports…",
+        "BudgetAI 2.0 Live – Transforming chaotic data into insights",
         "Real-time monitoring of 47 county budgets active"
     ]
 
     const displayHeadlines = headlines.length > 0 ? headlines : defaultHeadlines;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 h-12 flex items-center px-6 overflow-hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-t border-white/10 h-12 flex items-center px-6 overflow-hidden shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
             <div className="flex items-center gap-4 w-full justify-between">
                 <div className="flex items-center gap-4 flex-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-2 py-1 rounded">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-accent bg-accent/10 px-2 py-1 rounded font-plus-jakarta">
                         Todays:
                     </span>
                     <div className="relative h-6 flex-1 overflow-hidden">
@@ -62,7 +62,7 @@ export function EconomicTicker({ headlines = [] }: { headlines?: string[] }) {
                         </AnimatePresence>
                     </div>
                 </div>
-                <div className="text-[10px] font-mono text-muted-foreground whitespace-nowrap hidden md:block">
+                <div className="text-[10px] font-mono tabular-nums text-muted-foreground whitespace-nowrap hidden md:block opacity-70">
                     {currentTime}
                 </div>
             </div>

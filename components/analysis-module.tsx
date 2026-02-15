@@ -4,20 +4,27 @@ import { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Download, TrendingUp, CircleCheck, FileText, Search } from "lucide-react"
+import { Download, TrendingUp, CircleCheck, FileText, Search, BarChart3 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { GPUAnalysisButton } from "./gpu-analysis-button"
 import { DoclingAnalysisButton } from "./docling-analysis-button"
 import { GoogleAnalysisButton } from "./google-analysis-button"
 import { Input } from "@/components/ui/input"
 import { generateIntegrityReport } from "@/lib/pdf-generator"
+import { FeedbackModal } from "@/components/feedback-modal"
 
-export function AnalysisScorecard() {
+interface AnalysisScorecardProps {
+  userEmail?: string
+}
+
+export function AnalysisScorecard({ userEmail }: AnalysisScorecardProps) {
   const [county, setCounty] = useState("")
   const [year, setYear] = useState("")
   const [documents, setDocuments] = useState<any[]>([])
   const [result, setResult] = useState<any | null>(null)
   const [countySearch, setCountySearch] = useState("")
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [currentAnalysisId, setCurrentAnalysisId] = useState<number | undefined>(undefined)
 
   // --- Fetch uploaded documents from your DB ---
   useEffect(() => {
@@ -50,25 +57,34 @@ export function AnalysisScorecard() {
 
   // Auto-load existing analysis if available
   useEffect(() => {
+    // Only auto-load if we don't already have a valid result for THIS county/year
+    // or if the county/year changed.
+    const isSameContext = result && result.county === county && result.year === year;
+
     if (currentDoc && currentDoc.analysis_id) {
-      setResult({
-        county: currentDoc.county,
-        year: currentDoc.year,
-        summary_text: currentDoc.summary_text,
-        key_metrics: currentDoc.key_metrics,
-        intelligence: currentDoc.intelligence,
-        method: "Stored Audit Report",
-        id: currentDoc.analysis_id
-      })
-    } else {
+      if (!isSameContext || (result && result.method !== "Stored Audit Report" && result.method !== "Google Gemini (Long Context)" && result.method !== "Docling Colab")) {
+        if (!isSameContext) {
+          setResult({
+            county: currentDoc.county,
+            year: currentDoc.year,
+            summary_text: currentDoc.summary_text,
+            key_metrics: currentDoc.key_metrics,
+            intelligence: currentDoc.intelligence,
+            raw_verified_data: currentDoc.raw_verified_data,
+            method: "Stored Audit Report",
+            id: currentDoc.analysis_id
+          })
+        }
+      }
+    } else if (!isSameContext) {
       setResult(null)
     }
-  }, [county, year, documents])
+  }, [county, year, documents]) // Reverting removal of countySearch from deps
 
   // --- Helper to format numbers legibly ---
   const formatValue = (key: string, value: any) => {
     if (value === null || value === undefined || value === 0) return "Not Found"
-    if (key.includes("pct") || key.includes("rate") || key.includes("performance")) return `${value}%`
+    if (key.toLowerCase().includes("pct") || key.toLowerCase().includes("rate") || key.toLowerCase().includes("performance")) return `${value}%`
     if (typeof value === "number" && value > 1000) return `Ksh ${value.toLocaleString()}`
     return String(value)
   }
@@ -77,7 +93,6 @@ export function AnalysisScorecard() {
   const handleGPUResults = (data: any) => {
     if (!data) return
 
-    // Normalize response formats across pipelines
     const interpreted = data.interpreted_data || data
     const summary = interpreted.summary_text || data.summary_text || interpreted.executive_summary || "No summary generated."
 
@@ -98,6 +113,7 @@ export function AnalysisScorecard() {
     setResult({
       ...interpreted,
       county: interpreted.county || county,
+      year: year,
       method: data.method || interpreted.method || "Analysis Engine",
       summary_text: summary,
       key_metrics: keyMetrics,
@@ -106,13 +122,16 @@ export function AnalysisScorecard() {
       processing_time_sec: data.processing_time_sec || interpreted.processing_time_sec
     })
 
-    // Refresh documents to show the new analysis immediately in local state
+    if (interpreted.id || data.id) {
+      setCurrentAnalysisId(interpreted.id || data.id)
+      setShowFeedbackModal(true)
+    }
+
     fetch("/api/documents")
       .then(res => res.json())
       .then(data => { if (data.success) setDocuments(data.documents) })
   }
 
-  // --- Download Professional Integrity Report ---
   const downloadSummary = () => {
     if (!result) return
     generateIntegrityReport(result)
@@ -131,15 +150,14 @@ export function AnalysisScorecard() {
       </CardHeader>
 
       <CardContent className="p-8 space-y-8">
-        {/* --- Selection Grid --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Jurisdiction</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">County Name</label>
             <Select value={county} onValueChange={(val) => { setCounty(val); setYear("") }}>
               <SelectTrigger className="bg-slate-900/80 border-slate-800 text-white h-12">
                 <SelectValue placeholder="Select County" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-950 border-slate-800 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-w-[240px]">
+              <SelectContent className="bg-slate-950 border-slate-800 text-white shadow-2xl min-w-[240px]">
                 <div className="p-2 border-b border-slate-800 flex items-center gap-2 sticky top-0 bg-slate-950 z-20">
                   <Search className="h-4 w-4 text-slate-400" />
                   <Input
@@ -172,7 +190,7 @@ export function AnalysisScorecard() {
             <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Period</label>
             <Select value={year} onValueChange={setYear} disabled={!county}>
               <SelectTrigger className="bg-slate-900/80 border-slate-800 text-white h-12">
-                <SelectValue placeholder={county ? "Select Financial Year" : "Select County first"} />
+                <SelectValue placeholder={county ? "Financial Year" : "Select County first"} />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-slate-800 text-white shadow-2xl">
                 {availableYears.map((y) => (
@@ -183,41 +201,21 @@ export function AnalysisScorecard() {
           </div>
         </div>
 
-        {/* --- Analysis Actions --- */}
         <div className="flex flex-col items-center gap-6 bg-slate-900/30 p-10 rounded-3xl border-2 border-dashed border-slate-800 transition-all hover:bg-slate-900/40">
           {currentDoc ? (
             <div className="flex flex-col items-center gap-6">
               {result?.method === "Stored Audit Report" && (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-full flex items-center gap-3 animate-pulse">
                   <div className="h-2 w-2 bg-emerald-500 rounded-full" />
-                  <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Analysis Database Hit: Ready for Download</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Analysis Database Hit: Ready</span>
                 </div>
               )}
 
               <div className="flex flex-wrap justify-center gap-4">
-                <GPUAnalysisButton
-                  pdfId={currentDoc.filenames[0]}
-                  county={county}
-                  year={year}
-                  onAnalysisComplete={handleGPUResults}
-                />
-                <DoclingAnalysisButton
-                  pdfId={currentDoc.filenames[0]}
-                  county={county}
-                  year={year}
-                  onAnalysisComplete={handleGPUResults}
-                />
-                <GoogleAnalysisButton
-                  pdfId={currentDoc.filenames[0]}
-                  county={county}
-                  year={year}
-                  onAnalysisComplete={handleGPUResults}
-                />
+                <GPUAnalysisButton pdfId={currentDoc.filenames[0]} county={county} year={year} onAnalysisComplete={handleGPUResults} />
+                <DoclingAnalysisButton pdfId={currentDoc.filenames[0]} county={county} year={year} onAnalysisComplete={handleGPUResults} />
+                <GoogleAnalysisButton pdfId={currentDoc.filenames[0]} county={county} year={year} onAnalysisComplete={handleGPUResults} />
               </div>
-
-              {!result && (
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-[0.2em]">Select a pipeline to trigger diagnostic</p>
-              )}
             </div>
           ) : (
             <div className="text-center">
@@ -225,108 +223,134 @@ export function AnalysisScorecard() {
                 <FileText className="h-8 w-8 text-slate-500 opacity-50" />
               </div>
               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Awaiting Selection</p>
-              <p className="text-xs text-slate-500 mt-1 max-w-[250px] mx-auto">Only counties with uploaded PDF reports are visible above.</p>
+              <p className="text-xs text-slate-500 mt-1 max-w-[250px] mx-auto">Upload and select a county report to proceed with AI analysis.</p>
             </div>
           )}
         </div>
 
-        {/* --- Results Display --- */}
+        {/* --- Results Display: Deep Space Audit Theme --- */}
         {result && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Header with Risk Score */}
-            <div className="flex items-end justify-between border-b border-slate-800 pb-6">
-              <div className="space-y-1">
-                <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 mb-2 uppercase tracking-tighter text-[10px]">Audit Pass Verified</Badge>
-                <h3 className="text-4xl font-extrabold text-white tracking-tight">
-                  {result.county || county}
-                </h3>
-                <p className="text-sm font-medium text-slate-500 uppercase tracking-[0.2em] flex items-center">
-                  FY {year} <span className="mx-3 text-slate-800">|</span> {result.method}
-                </p>
+          <div className="space-y-0 -mx-8 -mb-8 bg-slate-950/40 text-slate-300 border-t border-slate-800">
+            {/* Header: PDF Banner Style */}
+            <div className="bg-[#0f172a] text-white p-10">
+              <div className="flex justify-between items-start mb-6">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="bg-indigo-600 h-6 w-6 rounded-md flex items-center justify-center">
+                      <BarChart3 className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">BudgetAI Integrity Suite</span>
+                  </div>
+                  <h3 className="text-3xl font-bold tracking-tight uppercase">Budget Integrity Report</h3>
+                  <p className="text-slate-400 text-sm font-medium">
+                    {result.county.toUpperCase()} COUNTY | FINANCIAL YEAR {year}
+                  </p>
+                  <p className="text-indigo-400 text-[10px] font-bold tracking-widest mt-1 uppercase">
+                    PIPELINE: {result.method?.toUpperCase() || "NEURAL ANALYSIS"}
+                  </p>
+                </div>
               </div>
+            </div>
 
+            <div className="p-10 space-y-12">
+              {/* Risk Assessment: Score on Left, Description on Right */}
               {result.intelligence?.transparency_risk_score !== undefined && (
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-widest">Fiscal Risk Verdict</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className={`text-4xl font-black ${result.intelligence.transparency_risk_score > 60 ? 'text-red-500' : 'text-emerald-500'}`}>
-                      {result.intelligence.transparency_risk_score}
-                    </span>
-                    <span className="text-slate-600 font-bold text-lg">/100</span>
+                <div className="space-y-4">
+                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Fiscal Risk Assessment</p>
+                  <div className="h-px bg-slate-200 w-full" />
+                  <div className="flex flex-col md:flex-row gap-10 items-center">
+                    <div className="flex items-baseline gap-1">
+                      <span className={`text-7xl font-black ${result.intelligence.transparency_risk_score > 60 ? 'text-red-600' : 'text-emerald-600'}`}>
+                        {result.intelligence.transparency_risk_score}
+                      </span>
+                      <span className="text-slate-400 font-bold text-2xl">/100</span>
+                    </div>
+                    <div className="flex-1 space-y-1 border-l-2 border-slate-800 pl-8">
+                      <p className="font-bold text-lg text-slate-300">
+                        {result.intelligence.transparency_risk_score > 60 ? 'CRITICAL OBSERVATION' : 'STABLE AUDIT PASS'}
+                      </p>
+                      <p className="text-sm text-slate-400 leading-relaxed font-semibold">
+                        {result.intelligence.transparency_risk_score > 60
+                          ? "Automated risk engines detected structural anomalies in reported vs verified data. Immediate manual review recommended."
+                          : "Reported figures align with verified institutional landmarks. No significant structural variance detected."}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Verification Pillar (OSR) */}
-            {result.raw_verified_data && (
-              <Card className="border-emerald-500/20 bg-emerald-500/[0.03] overflow-hidden shadow-emerald-500/5 shadow-2xl">
-                <div className="bg-emerald-500/10 px-5 py-3 border-b border-emerald-500/10 flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <CircleCheck className="h-4 w-4 text-emerald-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Immutable Table Benchmarks</span>
+              {/* Benchmarks: Emerald Pillar Box */}
+              {result.raw_verified_data && (
+                <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden relative shadow-2xl">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500" />
+                  <div className="p-8">
+                    <div className="flex justify-between items-center mb-6">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Immutable Data Landmarks (OSR Verification)</span>
+                        <span className="text-[11px] text-slate-500 mt-1 uppercase font-bold tracking-tight">Source: {result.raw_verified_data.source || "Official Audit Report"}</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-tight">OSR Revenue Target</p>
+                        <p className="text-xl font-black text-blue-400">KSh {result.raw_verified_data.osr_target || "0"}</p>
+                      </div>
+                      <div className="space-y-1 border-l border-slate-800 pl-8">
+                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-tight">Actual OSR Collected</p>
+                        <p className="text-xl font-black text-blue-400">KSh {result.raw_verified_data.osr_actual || "0"}</p>
+                      </div>
+                      <div className="space-y-1 border-l border-slate-800 pl-8">
+                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-tight">OSR Performance</p>
+                        <p className="text-xl font-black text-blue-400">{result.raw_verified_data.osr_performance || "0"}%</p>
+                      </div>
+                    </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-500 bg-emerald-500/5 px-2 uppercase font-black">{result.raw_verified_data.source}</Badge>
                 </div>
-                <CardContent className="p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <div className="space-y-2 border-r border-emerald-500/10 pr-4">
-                      <p className="text-[11px] text-emerald-500/50 uppercase font-black tracking-widest">OSR Revenue Target</p>
-                      <p className="text-2xl font-mono font-black text-emerald-400">{result.raw_verified_data.osr_target || "0"}</p>
-                    </div>
-                    <div className="space-y-2 border-r border-emerald-500/10 pr-4">
-                      <p className="text-[11px] text-emerald-500/50 uppercase font-black tracking-widest">Actual OSR Collected</p>
-                      <p className="text-2xl font-mono font-black text-emerald-400">{result.raw_verified_data.osr_actual || "0"}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-[11px] text-emerald-500/50 uppercase font-black tracking-widest">OSR Percentage Score</p>
-                      <p className="text-2xl font-mono font-black text-emerald-400">{result.raw_verified_data.osr_performance || "N/A"}%</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+              )}
 
-            {/* AI Narrative Analysis */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-              <div className="relative bg-slate-900/80 backdrop-blur-sm border border-slate-800 text-white p-10 rounded-3xl shadow-2xl">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-blue-500/20 p-2 rounded-xl border border-blue-500/30">
-                    <TrendingUp className="h-5 w-5 text-blue-400" />
-                  </div>
-                  <h4 className="font-black uppercase tracking-[0.3em] text-[11px] text-blue-400">Senior Audit Narrative</h4>
+              {/* Metric Grid: White Cards with Technical IDs */}
+              <div className="space-y-6">
+                <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest text-left">Neural Extraction Telemetry</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {result.key_metrics && Object.entries(result.key_metrics).map(([key, value]) => (
+                    <div key={key} className="bg-slate-900/50 border border-slate-800 p-6 rounded-lg text-left hover:bg-slate-900 transition-all border-l-4 border-l-slate-700">
+                      <p className="text-[10px] text-slate-500 uppercase font-black mb-1 leading-tight">{key.replaceAll("_", " ")}</p>
+                      <p className="text-lg font-black text-white tracking-tight">{formatValue(key, value)}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-lg whitespace-pre-line leading-relaxed font-medium text-slate-300 antialiased">
+              </div>
+
+              {/* Summary: Narrative with Indigo Accent */}
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h4 className="font-black text-indigo-700 text-lg uppercase tracking-tight">Senior Audit Executive Narrative</h4>
+                  <div className="h-1.5 bg-indigo-700 w-16" />
+                </div>
+                <div className="text-base text-emerald-400 leading-relaxed font-semibold whitespace-pre-line text-left">
                   {result.summary_text}
                 </div>
               </div>
-            </div>
 
-            {/* Detailed Metric Cards (Fixed White Boxes) */}
-            {result.key_metrics && (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                {Object.entries(result.key_metrics).map(([key, value]) => (
-                  <Card key={key} className="bg-slate-900 border-slate-800 shadow-xl overflow-hidden group hover:border-slate-700 transition-colors">
-                    <CardContent className="p-6 relative text-left">
-                      <div className="absolute top-0 left-0 w-1 h-full bg-slate-800 group-hover:bg-blue-500/50 transition-colors" />
-                      <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider mb-2">{key.replaceAll("_", " ")}</p>
-                      <p className="text-xl font-black text-white tracking-tight">{formatValue(key, value)}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              {/* Actions */}
+              <div className="flex justify-center pt-10 border-t border-slate-800">
+                <Button onClick={downloadSummary} className="bg-white text-black hover:bg-slate-100 px-12 h-14 rounded-full font-bold uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-transform">
+                  <Download className="h-4 w-4 mr-3" /> Export Integrity Report
+                </Button>
               </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex justify-center pt-8 border-t border-slate-800/50">
-              <Button onClick={downloadSummary} variant="outline" className="bg-white text-black hover:bg-slate-100 px-12 h-14 rounded-full font-black uppercase tracking-widest text-xs transition-transform active:scale-95 shadow-2xl">
-                <Download className="h-4 w-4 mr-3" /> Download Integrity Report
-              </Button>
             </div>
           </div>
         )}
       </CardContent>
+
+      {userEmail && (
+        <FeedbackModal
+          open={showFeedbackModal}
+          onOpenChange={setShowFeedbackModal}
+          userEmail={userEmail}
+          analysisId={currentAnalysisId}
+        />
+      )}
     </Card>
   )
 }

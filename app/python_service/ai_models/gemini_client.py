@@ -53,6 +53,7 @@ class GeminiClient:
                 "recurrent_expenditure": "number",
                 "personnel_emoluments": "number",
                 "pending_bills": "number",
+                "osr_performance": "number (percentage of target collected)",
                 "fiscal_health_score": "number between 1-10",
                 "risk_assessment": "Low/Moderate/High",
                 "executive_summary": "A concise professional summary of the county's fiscal performance."

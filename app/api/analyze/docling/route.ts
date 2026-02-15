@@ -58,10 +58,10 @@ export async function POST(req: Request) {
 
             if (existingAnalysis.rows.length > 0) {
                 // Update
-                await client.query(
+                const updateRes = await client.query(
                     `UPDATE analysis_results SET 
               revenue = $1, expenditure = $2, intelligence = $3, summary_text = $4, raw_extracted = $5, year = $6, created_at = CURRENT_TIMESTAMP
-             WHERE id = $7`,
+             WHERE id = $7 RETURNING id`,
                     [
                         JSON.stringify(keyMetrics),
                         JSON.stringify(interpreted.sectoral_allocations || {}),
@@ -72,14 +72,15 @@ export async function POST(req: Request) {
                         existingAnalysis.rows[0].id
                     ]
                 )
+                result.id = updateRes.rows[0].id
                 console.log(`✅ Updated Docling analysis for ${county}`)
             } else {
                 // Insert
-                await client.query(
+                const insertRes = await client.query(
                     `INSERT INTO analysis_results (
               upload_id, county, year, revenue, expenditure, 
               intelligence, summary_text, raw_extracted
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
                     [
                         upload_id,
                         county,
@@ -91,6 +92,7 @@ export async function POST(req: Request) {
                         JSON.stringify(raw_extracted)
                     ]
                 )
+                result.id = insertRes.rows[0].id
                 console.log(`✅ Saved new Docling analysis for ${county}`)
             }
         } finally {

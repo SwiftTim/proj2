@@ -32,6 +32,40 @@ def init_db():
         );
     """)
     
+    # User roles for RBAC
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS user_roles (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(255) UNIQUE NOT NULL,
+            username VARCHAR(100),
+            email VARCHAR(255) UNIQUE,
+            password_hash TEXT,
+            role VARCHAR(50) DEFAULT 'public',
+            permissions JSONB,
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
+
+    # Function and Trigger for automatic updated_at
+    cur.execute("""
+        CREATE OR REPLACE FUNCTION update_updated_at_column()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $$ language 'plpgsql';
+    """)
+
+    cur.execute("""
+        DROP TRIGGER IF EXISTS update_user_roles_updated_at ON user_roles;
+        CREATE TRIGGER update_user_roles_updated_at
+        BEFORE UPDATE ON user_roles
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    """)
+
     # New trending_merits table for daily hot takes (Enhanced)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS trending_merits (
@@ -55,6 +89,28 @@ def init_db():
         ON trending_merits(date DESC);
     """)
     
+    # System settings for global constants (Budget figures, etc.)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS system_settings (
+            key VARCHAR(255) PRIMARY KEY,
+            value JSONB,
+            updated_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
+
+    # User Feedback for the "Intelligence Feedback Loop"
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS user_feedback (
+            id SERIAL PRIMARY KEY,
+            user_email VARCHAR(255),
+            rating INTEGER,
+            category VARCHAR(50), -- 'quality', 'speed', 'accuracy', 'other'
+            comment TEXT,
+            analysis_id INTEGER,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
+
     conn.commit()
     cur.close()
     conn.close()

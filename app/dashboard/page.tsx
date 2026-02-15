@@ -31,8 +31,10 @@ import { NationalBudgetHeader } from "@/components/national-budget-header"
 import { CountyAllocationCarousel } from "@/components/county-allocation-carousel"
 import { UnifiedAIDashboard } from "@/components/unified-ai-dashboard"
 import { SectoralAllocationChart } from "@/components/sectoral-allocation-chart"
+import { CountyBenchmarkChart } from "@/components/county-benchmark-chart"
 import { EconomicTicker } from "@/components/economic-ticker"
 import { AuthModal } from "@/components/auth-modal"
+import { ProfileSettingsModal } from "@/components/profile-settings-modal"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { DashboardSkeleton, DocumentListSkeleton } from "@/components/loading-skeleton"
 import Link from "next/link"
@@ -48,9 +50,11 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [user, setUser] = useState<User | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   const [headlines, setHeadlines] = useState<string[]>([])
+  const [trendingData, setTrendingData] = useState<any>(null)
 
   useEffect(() => {
     const initializeDashboard = async () => {
@@ -82,6 +86,8 @@ export default function DashboardPage() {
         return "bg-chart-2/10 text-chart-2 border-chart-2/20"
       case "government":
         return "bg-chart-3/10 text-chart-3 border-chart-3/20"
+      case "admin":
+        return "bg-purple-500/10 text-purple-500 border-purple-500/20"
       default:
         return "bg-chart-4/10 text-chart-4 border-chart-4/20"
     }
@@ -123,15 +129,15 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/">
+                  <Link href="/" aria-label="Go to Home page">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Home
                   </Link>
                 </Button>
                 <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-8 w-8 text-accent" />
+                  <BarChart3 className="h-8 w-8 text-accent" aria-hidden="true" />
                   <div>
-                    <h1 className="text-2xl font-bold text-foreground">BudgetAI Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-foreground font-plus-jakarta">BudgetAI Dashboard</h1>
                     <p className="text-sm text-muted-foreground">National Fiscal Transparency Engine</p>
                   </div>
                 </div>
@@ -144,10 +150,23 @@ export default function DashboardPage() {
                   <div className="flex items-center space-x-3">
                     <div className="text-right">
                       <p className="text-sm font-medium">{user.name}</p>
-                      <Badge className={getRoleBadgeColor(user.role)} variant="secondary">
-                        {user.role}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {user.role === "admin" && (
+                          <Button variant="ghost" size="sm" asChild className="h-6 px-2 text-[10px] bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 border border-purple-500/20">
+                            <Link href="/admin">
+                              <Settings className="h-3 w-3 mr-1" />
+                              Management
+                            </Link>
+                          </Button>
+                        )}
+                        <Badge className={getRoleBadgeColor(user.role)} variant="secondary">
+                          {user.role}
+                        </Badge>
+                      </div>
                     </div>
+                    <Button variant="ghost" size="sm" onClick={() => setShowProfileModal(true)} className="h-9 w-9 p-0 rounded-full border border-border">
+                      <Settings className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                    </Button>
                     <Button variant="outline" size="sm" onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
@@ -200,12 +219,14 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     <Input
-                      placeholder="Search counties..."
+                      placeholder="Search counties…"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10 w-64"
+                      autoComplete="off"
+                      aria-label="Search counties"
                     />
                   </div>
                 </div>
@@ -215,10 +236,18 @@ export default function DashboardPage() {
                 <DashboardStats />
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   <div className="lg:col-span-3">
-                    <UnifiedAIDashboard onTickerUpdate={setHeadlines} />
+                    <UnifiedAIDashboard
+                      onTickerUpdate={setHeadlines}
+                      onDataUpdate={(data) => setTrendingData(data.daily_audit.county_1)}
+                    />
                   </div>
-                  <div className="lg:col-span-1">
-                    <SectoralAllocationChart />
+                  <div className="lg:col-span-1 space-y-6">
+                    <SectoralAllocationChart
+                      trendingData={trendingData ? {
+                        name: trendingData.name,
+                        priorities: trendingData.priorities || { health: 12, education: 22, agriculture: 8 }
+                      } : undefined}
+                    />
                   </div>
                 </div>
               </Suspense>
@@ -276,7 +305,7 @@ export default function DashboardPage() {
                   </div>
 
                   <ErrorBoundary>
-                    <AnalysisScorecard />
+                    <AnalysisScorecard userEmail={user.email} />
                   </ErrorBoundary>
                 </>
               ) : (
@@ -335,6 +364,14 @@ export default function DashboardPage() {
         <EconomicTicker headlines={headlines} />
 
         <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} onAuthSuccess={setUser} />
+        {user && (
+          <ProfileSettingsModal
+            open={showProfileModal}
+            onOpenChange={setShowProfileModal}
+            currentUser={user}
+            onUpdateSuccess={(updatedUser) => setUser(updatedUser)}
+          />
+        )}
       </div>
     </ErrorBoundary>
   )

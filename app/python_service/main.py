@@ -353,16 +353,15 @@ async def get_trending_merits(days: int = 7):
         conn = get_db_connection()
         cur = conn.cursor()
         
-        # Fetch recent hot takes
+        # Fetch recent hot takes (Removed date restriction to ensure dashboard always has content)
         cur.execute("""
             SELECT 
                 id, date, topic_name, description, keywords, 
-                priority_score, daily_audit, economic_ticker, created_at
+                priority_score, daily_audit, economic_ticker, created_at, raw_gemini_response
             FROM trending_merits
-            WHERE date >= CURRENT_DATE - INTERVAL '%s days'
             ORDER BY date DESC, priority_score DESC
             LIMIT 10
-        """, (days,))
+        """)
         
         rows = cur.fetchall()
         cur.close()
@@ -382,7 +381,8 @@ async def get_trending_merits(days: int = 7):
                 "priority_score": row["priority_score"],
                 "daily_audit": row["daily_audit"],
                 "economic_ticker": row["economic_ticker"],
-                "created_at": row["created_at"].isoformat() if row["created_at"] else None
+                "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+                "raw_gemini_response": row["raw_gemini_response"]
             }
             
             # Enhance with mapper data

@@ -30,7 +30,8 @@ class GeminiBudgetProcessor:
                         "Development Exp": raw_data.get("development_expenditure", 0),
                         "Recurrent Exp": raw_data.get("recurrent_expenditure", 0),
                         "Personnel Emoluments": raw_data.get("personnel_emoluments", 0),
-                        "Pending Bills": raw_data.get("pending_bills", 0)
+                        "Pending Bills": raw_data.get("pending_bills", 0),
+                        "OSR Performance": raw_data.get("osr_performance", 0)
                     },
                     "intelligence": {
                         "transparency_risk_score": (raw_data.get("fiscal_health_score", 5) * 10), # Scale 1-10 to 1-100
@@ -42,6 +43,7 @@ class GeminiBudgetProcessor:
                 "raw_verified_data": {
                     "osr_actual": raw_data.get("own_source_revenue_actual"),
                     "osr_target": raw_data.get("own_source_revenue_target"),
+                    "osr_performance": raw_data.get("osr_performance", 0),
                     "total_osr_actual": raw_data.get("own_source_revenue_actual"),
                     "source": "Google Gemini AI Synthesis (Full PDF Context)"
                 }

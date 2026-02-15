@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +24,7 @@ export function AuthModal({ open, onOpenChange, onAuthSuccess }: AuthModalProps)
   const [isLoading, setIsLoading] = useState(false)
   const [loginForm, setLoginForm] = useState({ email: "", password: "" })
   const [signupForm, setSignupForm] = useState({ name: "", email: "", password: "", role: "researcher" })
+  const router = useRouter()
 
   const showSuccess = useSuccessNotification()
   const showError = useErrorNotification()
@@ -36,25 +38,31 @@ export function AuthModal({ open, onOpenChange, onAuthSuccess }: AuthModalProps)
     }
 
     setIsLoading(true)
-
     try {
-      // Simulate authentication
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginForm)
+      })
 
-      // Mock successful login
-      const user = {
-        name: loginForm.email.split("@")[0],
-        email: loginForm.email,
-        role: "researcher",
+      const data = await res.json()
+      if (data.success) {
+        localStorage.setItem("auth_user", JSON.stringify(data.user))
+        onAuthSuccess(data.user)
+        onOpenChange(false)
+
+        showSuccess(data.user.role === 'admin' ? "Admin Access Granted" : "Welcome back!", "Authentication successful.")
+
+        if (data.user.role === 'admin') {
+          router.push("/admin")
+        } else {
+          router.push("/dashboard")
+        }
+      } else {
+        showError("Sign in failed", data.error || "Invalid credentials.")
       }
-
-      localStorage.setItem("auth_user", JSON.stringify(user))
-      onAuthSuccess(user)
-      onOpenChange(false)
-
-      showSuccess("Welcome back!", "You have successfully signed in.")
     } catch (error) {
-      showError("Sign in failed", "Please check your credentials and try again.")
+      showError("Connection error", "Could not connect to authentication service.")
     } finally {
       setIsLoading(false)
     }
@@ -69,25 +77,25 @@ export function AuthModal({ open, onOpenChange, onAuthSuccess }: AuthModalProps)
     }
 
     setIsLoading(true)
-
     try {
-      // Simulate registration
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signupForm)
+      })
 
-      // Mock successful registration
-      const user = {
-        name: signupForm.name,
-        email: signupForm.email,
-        role: signupForm.role,
+      const data = await res.json()
+      if (data.success) {
+        localStorage.setItem("auth_user", JSON.stringify(data.user))
+        onAuthSuccess(data.user)
+        onOpenChange(false)
+        showSuccess("Account created!", "Welcome to the AI Budget Transparency platform.")
+        router.push("/dashboard")
+      } else {
+        showError("Registration failed", data.error || "Could not create account.")
       }
-
-      localStorage.setItem("auth_user", JSON.stringify(user))
-      onAuthSuccess(user)
-      onOpenChange(false)
-
-      showSuccess("Account created!", "Welcome to AI Budget Transparency platform.")
     } catch (error) {
-      showError("Registration failed", "Please try again or contact support.")
+      showError("Connection error", "Could not connect to registration service.")
     } finally {
       setIsLoading(false)
     }
