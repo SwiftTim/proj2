@@ -6,7 +6,7 @@ const getAlertColor = (health: string) => {
     case "critical": return "text-red-500"
     case "warning": return "text-amber-500"
     case "leader": return "text-emerald-500"
-    case "stable": return "text-blue-500"
+    case "stable": return "text-emerald-500"
     case "improving": return "text-purple-500"
     default: return "text-slate-400"
   }
@@ -52,7 +52,7 @@ export function LiveTicker() {
   if (alerts.length === 0) return null
 
   return (
-    <div className="w-full bg-slate-950/80 backdrop-blur-md border-y border-slate-800 py-3 overflow-hidden whitespace-nowrap">
+    <div className="w-full bg-black/80 backdrop-blur-md border-y border-slate-800 py-3 overflow-hidden whitespace-nowrap">
       <div className="flex animate-marquee">
         {[...alerts, ...alerts].map((alert, index) => (
           <div key={index} className="flex items-center mx-8 text-sm font-medium">

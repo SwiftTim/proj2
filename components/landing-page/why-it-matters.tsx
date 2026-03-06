@@ -16,7 +16,7 @@ export function WhyItMatters() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                 <div className="space-y-10">
                     <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight">
-                        Visualizing the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Trade-off</span>
+                        Visualizing the <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-emerald-400">Trade-off</span>
                     </h2>
                     <p className="text-xl md:text-2xl text-slate-300 leading-relaxed font-light">
                         When a county spends over 50% on salaries, the remaining funds for life-saving infrastructure—roads, hospitals, and water—dwindle.
@@ -36,7 +36,7 @@ export function WhyItMatters() {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-900/70 to-slate-900/50 border border-slate-700/50 p-10 rounded-[3rem] shadow-2xl backdrop-blur-xl hover:border-slate-600 transition-all duration-300">
+                <div className="bg-gradient-to-br from-black/70 to-slate-900/50 border border-slate-700/50 p-10 rounded-[3rem] shadow-2xl backdrop-blur-xl hover:border-slate-600 transition-all duration-300">
                     <div className="h-[450px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data} layout="vertical" barSize={40} margin={{ left: 20, right: 20 }}>
@@ -49,7 +49,7 @@ export function WhyItMatters() {
                                     tick={{ fill: "#cbd5e1", fontSize: 16, fontWeight: 600 }}
                                 />
                                 <Tooltip
-                                    cursor={{ fill: "rgba(59, 130, 246, 0.1)" }}
+                                    cursor={{ fill: "rgba(220, 38, 38, 0.1)" }}
                                     contentStyle={{
                                         backgroundColor: "#0f172a",
                                         border: "1px solid #334155",

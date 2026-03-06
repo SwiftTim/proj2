@@ -79,8 +79,8 @@ export function CountyBenchmarkChart({ data }: Props) {
                                 }}
                             />
                             <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                            <Bar dataKey="County" fill="hsl(var(--accent))" radius={[0, 4, 4, 0]} barSize={12} />
-                            <Bar dataKey="National" fill="hsl(var(--muted))" radius={[0, 4, 4, 0]} barSize={12} />
+                            <Bar dataKey="County" fill="#10b981" radius={[0, 4, 4, 0]} barSize={12} />
+                            <Bar dataKey="National" fill="#94a3b8" radius={[0, 4, 4, 0]} barSize={12} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

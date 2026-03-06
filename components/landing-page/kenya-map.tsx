@@ -79,7 +79,7 @@ export function KenyaMap() {
 
     const handleMouseEnter = (e: React.MouseEvent, countyId: string) => {
         if (!activeCounty) {
-            gsap.to(e.currentTarget, { fill: "#3b82f6", duration: 0.3 })
+            gsap.to(e.currentTarget, { fill: "#dc2626", duration: 0.3 })
             const data = getCountyData(countyId)
             if (data) setHoveredCounty(data)
         }
@@ -203,17 +203,17 @@ export function KenyaMap() {
         switch (status?.toLowerCase()) {
             case "critical": return "#ef4444" // red
             case "warning": return "#f59e0b" // amber
-            case "stable": return "#3b82f6" // blue
+            case "stable": return "#10b981" // emerald (was blue)
             case "leader": return "#10b981" // green
-            case "improving": return "#8b5cf6" // purple
-            default: return "#3b82f6"
+            case "improving": return "#a855f7" // purple
+            default: return "#10b981"
         }
     }
 
     if (loading) {
         return (
-            <div className="w-full h-[600px] flex items-center justify-center bg-slate-950/50 rounded-xl border border-slate-800">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <div className="w-full h-[600px] flex items-center justify-center bg-black/50 rounded-xl border border-slate-800">
+                <Loader2 className="h-8 w-8 animate-spin text-red-500" />
                 <span className="ml-3 text-slate-400">Loading geospatial data...</span>
             </div>
         )
@@ -221,7 +221,7 @@ export function KenyaMap() {
 
     return (
         <div
-            className="relative w-full h-[600px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-2xl"
+            className="relative w-full h-[600px] bg-black rounded-xl overflow-hidden border border-slate-800 shadow-2xl"
             onMouseMove={handleMouseMove} // Track mouse globally in container
         >
             {/* Floating Tooltip (Portal-like behavior via fixed position or absolute if container relative) */}
@@ -273,9 +273,9 @@ export function KenyaMap() {
 
                             {/* AI Insight */}
                             <div className="relative pl-3 pt-1">
-                                <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-blue-500 rounded-full"></div>
-                                <p className="text-xs text-blue-200 italic leading-relaxed">
-                                    <span className="font-bold text-blue-400 not-italic mr-1">AI Insight:</span>
+                                <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-red-500 rounded-full"></div>
+                                <p className="text-xs text-red-200 italic leading-relaxed">
+                                    <span className="font-bold text-red-400 not-italic mr-1">AI Insight:</span>
                                     {hoveredCounty.aiInsight}
                                 </p>
                             </div>
@@ -299,7 +299,7 @@ export function KenyaMap() {
             <svg
                 ref={svgRef}
                 viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-                className="w-full h-full cursor-pointer bg-[#020617]"
+                className="w-full h-full cursor-pointer bg-black"
                 onClick={(e) => {
                     if (e.target === svgRef.current) handleReset()
                 }}
@@ -339,7 +339,7 @@ export function KenyaMap() {
             {/* Facts Panel Overlay */}
             <div
                 ref={panelRef}
-                className="absolute top-0 right-0 h-full w-full md:w-[400px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-800 p-8 shadow-2xl transform translate-x-full opacity-0 pointer-events-none md:pointer-events-auto"
+                className="absolute top-0 right-0 h-full w-full md:w-[400px] bg-black/95 backdrop-blur-xl border-l border-slate-800 p-8 shadow-2xl transform translate-x-full opacity-0 pointer-events-none md:pointer-events-auto"
                 style={{ pointerEvents: activeCounty ? 'auto' : 'none' }}
             >
                 {activeCounty && (
@@ -367,7 +367,7 @@ export function KenyaMap() {
                             {/* Population */}
                             <div className="fact-item bg-slate-950/50 p-4 rounded-xl border border-slate-800/50">
                                 <div className="flex items-center gap-3 mb-2 text-slate-400 text-sm font-medium uppercase tracking-wide">
-                                    <Users className="h-4 w-4 text-blue-500" /> Projected Population (2026)
+                                    <Users className="h-4 w-4 text-emerald-500" /> Projected Population (2026)
                                 </div>
                                 <div className="text-2xl font-bold text-white">{activeCounty.pop2026}</div>
                             </div>
@@ -389,19 +389,19 @@ export function KenyaMap() {
                             </div>
 
                             {/* AI Insight */}
-                            <div className="fact-item bg-gradient-to-br from-blue-900/20 to-purple-900/20 p-5 rounded-xl border border-blue-500/30 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                                <div className="flex items-center gap-2 mb-3 text-blue-400 text-xs font-bold uppercase">
+                            <div className="fact-item bg-gradient-to-br from-red-900/20 to-black p-5 rounded-xl border border-red-500/30 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+                                <div className="flex items-center gap-2 mb-3 text-red-400 text-xs font-bold uppercase">
                                     <span className="animate-pulse">●</span> BudgetAI Insight
                                 </div>
-                                <p className="text-lg text-blue-100/90 leading-relaxed italic">
+                                <p className="text-lg text-red-100/90 leading-relaxed italic">
                                     "{activeCounty.aiInsight}"
                                 </p>
                             </div>
                         </div>
 
                         <div className="fact-item mt-6 pt-6 border-t border-slate-800">
-                            <button className="w-full py-4 bg-white text-slate-950 font-bold rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 group">
+                            <button className="w-full py-4 bg-white text-slate-950 font-bold rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2 group">
                                 View Full Report
                                 <ArrowSheetRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                             </button>

@@ -47,7 +47,7 @@ export function SectoralAllocationChart({ trendingData }: Props) {
                                 nameKey="sector"
                             >
                                 {data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                    <Cell key={`cell-${index}`} fill={['#06b6d4', '#10b981', '#6366f1', '#f59e0b', '#f43f5e', '#8b5cf6'][index % 6]} stroke="rgba(0,0,0,0.5)" />
                                 ))}
                             </Pie>
                             <Tooltip
@@ -65,8 +65,8 @@ export function SectoralAllocationChart({ trendingData }: Props) {
                     {data.slice(0, 5).map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-                                <span className="text-muted-foreground">{item.sector}</span>
+                                <div className="h-2.5 w-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: ['#06b6d4', '#10b981', '#6366f1', '#f59e0b', '#f43f5e', '#8b5cf6'][idx % 6], color: ['#06b6d4', '#10b981', '#6366f1', '#f59e0b', '#f43f5e', '#8b5cf6'][idx % 6] }} />
+                                <span className="text-slate-300 font-medium">{item.sector}</span>
                             </div>
                             <span className="font-semibold">{item.percentage}%</span>
                         </div>

@@ -11,10 +11,10 @@ const getColor = (status: string) => {
     switch (status?.toLowerCase()) {
         case "critical": return "red"
         case "warning": return "amber"
-        case "status": return "blue"
+        case "status": return "emerald"
         case "leader": return "emerald"
         case "improving": return "purple"
-        default: return "blue"
+        default: return "emerald"
     }
 }
 
@@ -59,7 +59,7 @@ export function CountySpotlight() {
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         className="group"
                     >
-                        <Card className="bg-gradient-to-br from-slate-900/60 to-slate-900/40 border-slate-700/50 backdrop-blur-xl overflow-hidden relative hover:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/20">
+                        <Card className="bg-gradient-to-br from-black/60 to-slate-900/40 border-slate-700/50 backdrop-blur-xl overflow-hidden relative hover:border-red-600/30 transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/20">
                             {/* Gradient overlay on hover */}
                             <div className={`absolute inset-0 bg-gradient-to-br from-${county.color}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
 
@@ -71,7 +71,7 @@ export function CountySpotlight() {
                                     >
                                         {county.status} {county.score}
                                     </Badge>
-                                    <Search className="h-5 w-5 text-slate-600 group-hover:text-blue-400 transition-all duration-300 group-hover:rotate-12" />
+                                    <Search className="h-5 w-5 text-slate-600 group-hover:text-red-400 transition-all duration-300 group-hover:rotate-12" />
                                 </div>
                                 <CardTitle className="text-2xl text-white pt-4 font-bold tracking-tight">{county.name}</CardTitle>
                             </CardHeader>

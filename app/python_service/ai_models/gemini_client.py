@@ -26,7 +26,7 @@ class GeminiClient:
         try:
             # Upload the file
             sample_file = genai.upload_file(path=pdf_path, display_name=f"Budget_{county_name}")
-            print(f"📤 Uploaded file '{sample_file.display_name}' as: {sample_file.uri}")
+            print(f"Uploaded file '{sample_file.display_name}' as: {sample_file.uri}")
 
             # Wait for processing (though usually fast for small items, but good practice)
             # For Gemini 1.5, file processing is usually async
@@ -84,7 +84,7 @@ class GeminiClient:
             return result
 
         except Exception as e:
-            print(f"❌ Gemini Analysis Error: {str(e)}")
+            print(f"Gemini Analysis Error: {str(e)}")
             raise e
 
 if __name__ == "__main__":

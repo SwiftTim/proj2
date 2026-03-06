@@ -32,7 +32,7 @@ class HotTakeExtractor:
         Calls Gemini to perform the daily fiscal analysis.
         """
         prompt = """
-        You are a Senior Public Finance Analyst for Kenya. Use the current date Feb 5, 2026.
+        You are a Senior Public Finance Analyst for Kenya. Current date: CURRENT_DATE_PLACEHOLDER.
         Your goal is to synthesize data for a high-level budget transparency dashboard.
         
         Provide three sections in your response:
@@ -73,7 +73,7 @@ class HotTakeExtractor:
           },
           "economic_ticker": ["Headline 1", "Headline 2", "..."]
         }
-        """
+        """.replace("CURRENT_DATE_PLACEHOLDER", datetime.now().strftime('%b %d, %Y'))
 
         try:
             response = self.model.generate_content(prompt)

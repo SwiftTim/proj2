@@ -487,8 +487,8 @@ async def trigger_hot_take_analysis():
         result = await extractor.run_daily_extraction()
         
         return {
-            "success": result["status"] == "success",
-            "message": result["message"],
+            "success": result.get("success", False),
+            "message": "Analysis completed successfully" if result.get("success") else result.get("error", "Analysis failed"),
             "data": result.get("data")
         }
         

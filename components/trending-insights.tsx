@@ -249,8 +249,8 @@ export function TrendingInsights() {
                                         <BarChart data={formatDataForRecharts()}>
                                             <defs>
                                                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={0.8} />
-                                                    <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0.1} />
+                                                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8} />
+                                                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.1} />
                                                 </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted/30" />
@@ -275,13 +275,13 @@ export function TrendingInsights() {
                                                     borderRadius: "12px",
                                                     boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                                                 }}
-                                                itemStyle={{ color: "hsl(var(--accent))" }}
+                                                itemStyle={{ color: "#f59e0b" }}
                                             />
                                             <Bar
                                                 dataKey="value"
                                                 radius={[6, 6, 0, 0]}
                                                 fill="url(#barGradient)"
-                                                stroke="hsl(var(--accent))"
+                                                stroke="#f59e0b"
                                                 strokeWidth={1}
                                                 animationBegin={0}
                                                 animationDuration={1500}

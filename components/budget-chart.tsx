@@ -37,11 +37,11 @@ const trendData = [
 ]
 
 const categoryData = [
-  { name: "Infrastructure", value: 35, color: "hsl(var(--chart-1))" },
-  { name: "Healthcare", value: 25, color: "hsl(var(--chart-2))" },
-  { name: "Education", value: 20, color: "hsl(var(--chart-3))" },
-  { name: "Agriculture", value: 12, color: "hsl(var(--chart-4))" },
-  { name: "Other", value: 8, color: "hsl(var(--chart-5))" },
+  { name: "Infrastructure", value: 35, color: "#10b981" }, // Emerald 500
+  { name: "Healthcare", value: 25, color: "#3b82f6" }, // Blue 500
+  { name: "Education", value: 20, color: "#6366f1" }, // Indigo 500
+  { name: "Agriculture", value: 12, color: "#8b5cf6" }, // Violet 500
+  { name: "Other", value: 8, color: "#d946ef" }, // Fuchsia 500
 ]
 
 export function BudgetChart() {
@@ -63,15 +63,16 @@ export function BudgetChart() {
             <BarChart data={budgetData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis dataKey="county" className="text-xs" />
-              <YAxis className="text-xs" />
+              <YAxis className="text-xs" tickFormatter={(val) => `${val}B`} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                 }}
+                formatter={(value: any) => [`KSh ${value}B`, "Budget"]}
               />
-              <Bar dataKey="budget" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="budget" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -131,20 +132,21 @@ export function BudgetChart() {
             <LineChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis dataKey="year" className="text-xs" />
-              <YAxis className="text-xs" />
+              <YAxis className="text-xs" tickFormatter={(val) => `${val}B`} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                 }}
+                formatter={(value: any) => [`KSh ${value}B`, "Amount"]}
               />
               <Line
                 type="monotone"
                 dataKey="amount"
-                stroke="hsl(var(--chart-2))"
+                stroke="#06b6d4"
                 strokeWidth={3}
-                dot={{ fill: "hsl(var(--chart-2))", strokeWidth: 2, r: 4 }}
+                dot={{ fill: "#06b6d4", strokeWidth: 2, r: 4 }}
               />
             </LineChart>
           </ResponsiveContainer>

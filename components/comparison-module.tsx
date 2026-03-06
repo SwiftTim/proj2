@@ -119,17 +119,17 @@ export function ComparisonModule() {
     }
 
     return (
-        <Card className="max-w-6xl mx-auto border-slate-800 bg-slate-950/50 backdrop-blur-xl shadow-2xl">
-            <CardHeader className="border-b border-slate-800/50 bg-slate-900/20">
+        <Card className="max-w-6xl mx-auto border-neutral-800 bg-black/40 backdrop-blur-xl shadow-2xl">
+            <CardHeader className="border-b border-white/5 bg-white/5">
                 <div className="flex justify-between items-center">
                     <div>
                         <CardTitle className="text-white text-2xl font-black tracking-tight">Financial Comparison Suite</CardTitle>
-                        <CardDescription className="text-slate-400">Cross-reference budget data and verify integrity.</CardDescription>
+                        <CardDescription className="text-neutral-400">Cross-reference budget data and verify integrity.</CardDescription>
                     </div>
-                    <Tabs value={activeMode} onValueChange={setActiveMode} className="bg-slate-900/50 p-1 rounded-full border border-slate-800">
+                    <Tabs value={activeMode} onValueChange={setActiveMode} className="bg-neural-900/50 p-1 rounded-full border border-neutral-800">
                         <TabsList className="bg-transparent">
-                            <TabsTrigger value="push_compare" className="rounded-full px-6 data-[state=active]:bg-blue-600 data-[state=active]:text-white">PDF Push & Compare</TabsTrigger>
-                            <TabsTrigger value="county_vs_county" className="rounded-full px-6 data-[state=active]:bg-blue-600 data-[state=active]:text-white">Benchmarking</TabsTrigger>
+                            <TabsTrigger value="push_compare" className="rounded-full px-6 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">PDF Push & Compare</TabsTrigger>
+                            <TabsTrigger value="county_vs_county" className="rounded-full px-6 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Benchmarking</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>
@@ -146,26 +146,26 @@ export function ComparisonModule() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* County A */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-400">County A</label>
+                                        <label className="text-xs font-bold text-neutral-400">County A</label>
                                         <Select value={selectionA.county} onValueChange={(v) => setSelectionA({ ...selectionA, county: v })}>
-                                            <SelectTrigger className="bg-slate-900 border-slate-700 text-white h-12 hover:border-slate-600 focus:ring-0">
+                                            <SelectTrigger className="bg-neutral-900 border-neutral-700 text-white h-12 hover:border-neutral-600 focus:ring-0">
                                                 <SelectValue placeholder="Select First County" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-slate-900 border-slate-700 text-white backdrop-blur-xl">
-                                                {counties.map(c => <SelectItem key={c} value={c} className="hover:bg-slate-800 focus:bg-slate-800">{c}</SelectItem>)}
+                                            <SelectContent className="bg-neutral-900 border-neutral-700 text-white backdrop-blur-xl">
+                                                {counties.map(c => <SelectItem key={c} value={c} className="hover:bg-neutral-800 focus:bg-neutral-800">{c}</SelectItem>)}
                                             </SelectContent>
                                         </Select>
                                     </div>
 
                                     {/* County B */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-400">County B</label>
+                                        <label className="text-xs font-bold text-neutral-400">County B</label>
                                         <Select value={selectionB.county} onValueChange={(v) => setSelectionB({ ...selectionB, county: v })}>
-                                            <SelectTrigger className="bg-slate-900 border-slate-700 text-white h-12 hover:border-slate-600 focus:ring-0">
+                                            <SelectTrigger className="bg-neutral-900 border-neutral-700 text-white h-12 hover:border-neutral-600 focus:ring-0">
                                                 <SelectValue placeholder="Select Second County" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-slate-900 border-slate-700 text-white backdrop-blur-xl">
-                                                {counties.map(c => <SelectItem key={c} value={c} className="hover:bg-slate-800 focus:bg-slate-800">{c}</SelectItem>)}
+                                            <SelectContent className="bg-neutral-900 border-neutral-700 text-white backdrop-blur-xl">
+                                                {counties.map(c => <SelectItem key={c} value={c} className="hover:bg-neutral-800 focus:bg-neutral-800">{c}</SelectItem>)}
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -173,21 +173,21 @@ export function ComparisonModule() {
 
                                 {/* Document Selection */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400">Select Document to Push for Comparison</label>
+                                    <label className="text-xs font-bold text-neutral-400">Select Document to Push for Comparison</label>
                                     <Select value={pushCounty} onValueChange={setPushCounty}>
-                                        <SelectTrigger className="bg-slate-900 border-slate-700 text-white h-12 hover:border-slate-600 focus:ring-0">
+                                        <SelectTrigger className="bg-neutral-900 border-neutral-700 text-white h-12 hover:border-neutral-600 focus:ring-0">
                                             <SelectValue placeholder="Choose a document from uploaded files" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-slate-900 border-slate-700 text-white backdrop-blur-xl max-h-[300px]">
+                                        <SelectContent className="bg-neutral-900 border-neutral-700 text-white backdrop-blur-xl max-h-[300px]">
                                             {documents.map((doc, idx) => (
-                                                <SelectItem 
-                                                    key={idx} 
+                                                <SelectItem
+                                                    key={idx}
                                                     value={doc.county}
-                                                    className="hover:bg-slate-800 focus:bg-slate-800"
+                                                    className="hover:bg-neutral-800 focus:bg-neutral-800"
                                                 >
                                                     <div className="flex items-center justify-between w-full">
                                                         <span className="font-medium">{doc.county}</span>
-                                                        <span className="text-xs text-slate-500 ml-4">{doc.year || 'N/A'}</span>
+                                                        <span className="text-xs text-neutral-500 ml-4">{doc.year || 'N/A'}</span>
                                                     </div>
                                                 </SelectItem>
                                             ))}
@@ -225,8 +225,8 @@ export function ComparisonModule() {
                                         key={merit.id}
                                         onClick={() => toggleMerit(merit.id)}
                                         className={`p-4 rounded-2xl text-left border transition-all ${selectedMerits.includes(merit.id)
-                                                ? "bg-blue-600/10 border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.1)]"
-                                                : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
+                                            ? "bg-blue-600/10 border-blue-500/50 shadow-[0_0_20px_rgba(37,99,235,0.1)]"
+                                            : "bg-slate-900/50 border-slate-800 hover:border-slate-700"
                                             }`}
                                     >
                                         <div className="flex justify-between items-start">
@@ -310,10 +310,10 @@ export function ComparisonModule() {
                                                     <div className="flex justify-center">
                                                         <Badge
                                                             className={`text-xs font-bold ${Math.abs(comparison.variance_percent) < 5
-                                                                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                                    : Math.abs(comparison.variance_percent) < 10
-                                                                        ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                                                                        : 'bg-red-500/10 text-red-500 border-red-500/20'
+                                                                ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                                : Math.abs(comparison.variance_percent) < 10
+                                                                    ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                                                                    : 'bg-red-500/10 text-red-500 border-red-500/20'
                                                                 }`}
                                                         >
                                                             {comparison.variance_percent > 0 ? '+' : ''}{comparison.variance_percent.toFixed(1)}% Variance

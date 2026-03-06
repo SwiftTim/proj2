@@ -164,6 +164,7 @@ CREATE TABLE IF NOT EXISTS generated_reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
 -- ============================================================================
 -- INDEXES FOR PERFORMANCE
 -- ============================================================================

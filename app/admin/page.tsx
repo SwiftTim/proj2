@@ -626,7 +626,7 @@ export default function AdminPage() {
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-tighter ${f.category === 'accuracy' ? 'text-blue-400 border-blue-500/30' :
-                                                                f.category === 'quality' ? 'text-emerald-400 border-emerald-500/30' : 'text-purple-400 border-purple-500/30'
+                                                            f.category === 'quality' ? 'text-emerald-400 border-emerald-500/30' : 'text-purple-400 border-purple-500/30'
                                                             }`}>
                                                             {f.category}
                                                         </Badge>

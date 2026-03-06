@@ -200,19 +200,21 @@ export function UnifiedAIDashboard({
                                         axisLine={false}
                                         tickLine={false}
                                         tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
-                                        tickFormatter={(val) => `KSh ${val}B`}
+                                        tickFormatter={(val) => `${val}B`}
                                     />
                                     <Tooltip
-                                        cursor={{ fill: "hsl(var(--accent))", opacity: 0.05 }}
+                                        cursor={{ fill: "hsl(var(--accent))", opacity: 0.1 }}
                                         contentStyle={{
-                                            backgroundColor: "rgba(10, 10, 10, 0.9)",
+                                            backgroundColor: "rgba(10, 10, 10, 0.95)",
                                             border: "1px solid hsl(var(--border))",
                                             borderRadius: "12px",
+                                            backdropFilter: "blur(4px)"
                                         }}
+                                        formatter={(value: any) => [`${value}B`, "Amount"]}
                                     />
                                     <Legend iconType="circle" />
-                                    <Bar dataKey="Budgeted" fill="hsl(var(--muted))" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="Actual" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="Budgeted" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="Actual" fill="#10b981" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -239,14 +241,14 @@ export function UnifiedAIDashboard({
                                             </div>
                                         </div>
                                         <div className="flex items-baseline gap-2">
-                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.wage_bill > 35 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.wage_bill > 35 ? 'text-red-400' : 'text-emerald-400'}`}>
                                                 {data.daily_audit.county_1.compliance.wage_bill}%
                                             </span>
                                             <span className="text-[9px] text-slate-600 font-bold uppercase">/ 35% Limit</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.wage_bill > 35 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
-                                            <p className="text-[9px] text-slate-500 font-medium">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.wage_bill > 35 ? 'bg-red-400 animate-pulse' : 'bg-emerald-400'}`} />
+                                            <p className="text-[9px] text-slate-400 font-medium">
                                                 {data.daily_audit.county_1.compliance.wage_bill > 35 ? 'OVER CEILING' : 'COMPLIANT'}
                                             </p>
                                         </div>
@@ -261,14 +263,14 @@ export function UnifiedAIDashboard({
                                             </div>
                                         </div>
                                         <div className="flex items-baseline gap-2">
-                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.development < 30 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.development < 30 ? 'text-amber-400' : 'text-emerald-400'}`}>
                                                 {data.daily_audit.county_1.compliance.development}%
                                             </span>
                                             <span className="text-[9px] text-slate-600 font-bold uppercase">/ 30% Floor</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.development < 30 ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-                                            <p className="text-[9px] text-slate-500 font-medium">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.development < 30 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                                            <p className="text-[9px] text-slate-400 font-medium">
                                                 {data.daily_audit.county_1.compliance.development < 30 ? 'BELOW TARGET' : 'HEALTHY ALLOCATION'}
                                             </p>
                                         </div>
@@ -283,14 +285,14 @@ export function UnifiedAIDashboard({
                                             </div>
                                         </div>
                                         <div className="flex items-baseline gap-2">
-                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.audit_score < 60 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                            <span className={`text-2xl font-black ${data.daily_audit.county_1.compliance.audit_score < 60 ? 'text-red-400' : 'text-emerald-400'}`}>
                                                 {data.daily_audit.county_1.compliance.audit_score}
                                             </span>
                                             <span className="text-[9px] text-slate-600 font-bold uppercase">/ 100 Health</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.audit_score < 60 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
-                                            <p className="text-[9px] text-slate-500 font-medium whitespace-nowrap">
+                                            <div className={`h-1.5 w-1.5 rounded-full ${data.daily_audit.county_1.compliance.audit_score < 60 ? 'bg-red-400 animate-pulse' : 'bg-emerald-400'}`} />
+                                            <p className="text-[9px] text-slate-400 font-medium whitespace-nowrap">
                                                 {data.daily_audit.county_1.compliance.audit_score < 60 ? 'FISCAL RISK DETECTED' : 'LOW RISK PROFILE'}
                                             </p>
                                         </div>

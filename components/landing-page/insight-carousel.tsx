@@ -9,7 +9,7 @@ const getIconAndGradient = (health: string) => {
         case "critical": return { icon: <AlertCircle className="h-8 w-8 text-red-500" />, gradient: "from-red-500/10 to-transparent" }
         case "warning": return { icon: <ShieldAlert className="h-8 w-8 text-amber-500" />, gradient: "from-amber-500/10 to-transparent" }
         case "leader": return { icon: <TrendingUp className="h-8 w-8 text-emerald-500" />, gradient: "from-emerald-500/10 to-transparent" }
-        default: return { icon: <Building2 className="h-8 w-8 text-blue-500" />, gradient: "from-blue-500/10 to-transparent" }
+        default: return { icon: <Building2 className="h-8 w-8 text-emerald-500" />, gradient: "from-emerald-500/10 to-transparent" }
     }
 }
 
@@ -60,7 +60,7 @@ export function InsightCarousel() {
                 <p className="mt-4 text-xl text-slate-400 font-light">Deep dives into the data that shapes the nation.</p>
             </div>
 
-            <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl border border-slate-700/50 bg-black/60 backdrop-blur-xl shadow-2xl">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={current}
@@ -112,7 +112,7 @@ export function InsightCarousel() {
                         <button
                             key={i}
                             onClick={() => setCurrent(i)}
-                            className={`h-2 rounded-full transition-all duration-300 ${current === i ? "w-10 bg-blue-500 shadow-lg shadow-blue-500/50" : "w-2 bg-slate-600 hover:bg-slate-500"
+                            className={`h-2 rounded-full transition-all duration-300 ${current === i ? "w-10 bg-red-500 shadow-lg shadow-red-500/50" : "w-2 bg-slate-600 hover:bg-slate-500"
                                 }`}
                             aria-label={`Go to slide ${i + 1}`}
                         />

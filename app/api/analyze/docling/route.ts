@@ -73,7 +73,7 @@ export async function POST(req: Request) {
                     ]
                 )
                 result.id = updateRes.rows[0].id
-                console.log(`✅ Updated Docling analysis for ${county}`)
+                console.log(`Updated Docling analysis for ${county}`)
             } else {
                 // Insert
                 const insertRes = await client.query(

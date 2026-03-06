@@ -59,7 +59,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const initializeDashboard = async () => {
       // Simulate loading time
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 100))
 
       // Check for existing auth
       const savedUser = localStorage.getItem("auth_user")

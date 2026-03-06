@@ -32,7 +32,7 @@ class DoclingColabClient:
         url = f"{self.base_url}/convert"
         
         try:
-            logger.info(f"📤 Sending PDF to Colab Docling: {pdf_path} (County: {county})")
+            logger.info(f"Sending PDF to Colab Docling: {pdf_path} (County: {county})")
             
             with open(pdf_path, 'rb') as f:
                 files = {'file': (os.path.basename(pdf_path), f, 'application/pdf')}
