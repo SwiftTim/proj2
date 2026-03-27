@@ -20,7 +20,7 @@ import {
 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { KENYA_COUNTIES, FINANCIAL_YEARS } from "@/lib/constants"
-import jsPDF from "jspdf"
+import { generateIntegrityReport } from "@/lib/pdf-generator"
 
 export function DocumentList() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -72,35 +72,7 @@ export function DocumentList() {
 
   // --- Download PDF Summary ---
   const downloadReport = (doc: any) => {
-    const pdf = new jsPDF()
-    pdf.setFont("helvetica", "bold")
-    pdf.text(`${doc.county} County Budget Report`, 20, 20)
-    pdf.setFont("helvetica", "normal")
-
-    pdf.text(`Year: ${doc.year}`, 20, 35)
-    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45)
-
-    pdf.setFont("helvetica", "bold")
-    pdf.text("Extracted Key Metrics:", 20, 65)
-    pdf.setFont("helvetica", "normal")
-
-    if (doc.key_metrics) {
-      let y = 75
-      for (const [key, value] of Object.entries(doc.key_metrics as Record<string, any>)) {
-        pdf.text(`${key.replaceAll("_", " ")}: ${String(value)}`, 25, y)
-        y += 10
-      }
-    }
-
-    pdf.setFont("helvetica", "bold")
-    pdf.text("Summary Insights:", 20, 130)
-    pdf.setFont("helvetica", "normal")
-
-    const cleanSummary = (doc.summary_text || "No summary available.").replace(/[#*]/g, "")
-    const textLines = pdf.splitTextToSize(cleanSummary, 170)
-    pdf.text(textLines, 20, 140)
-
-    pdf.save(`${doc.county}_Report_${doc.year}.pdf`)
+    generateIntegrityReport(doc)
   }
 
   return (
@@ -185,7 +157,10 @@ export function DocumentList() {
                   <div className="flex items-center gap-2">
                     {doc.analysis_id && (
                       <Button
-                        onClick={() => downloadReport(doc)}
+                        onClick={() => downloadReport({
+                          ...doc,
+                          county: doc.analysis_county || doc.county
+                        })}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white"
                       >
                         <Download className="h-4 w-4 mr-2" />

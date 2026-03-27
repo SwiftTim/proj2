@@ -203,7 +203,7 @@ export function KenyaMap() {
         switch (status?.toLowerCase()) {
             case "critical": return "#ef4444" // red
             case "warning": return "#f59e0b" // amber
-            case "stable": return "#10b981" // emerald (was blue)
+            case "stable": return "#10b981" // emerald 
             case "leader": return "#10b981" // green
             case "improving": return "#a855f7" // purple
             default: return "#10b981"

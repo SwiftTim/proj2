@@ -48,4 +48,4 @@ export const KENYA_COUNTIES = [
     "West Pokot",
 ];
 
-export const FINANCIAL_YEARS = ["2022/23", "2024/25"];
+export const FINANCIAL_YEARS = ["2022/23", "2023/24", "2024/25", "2025/26"];

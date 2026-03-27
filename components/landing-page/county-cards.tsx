@@ -26,7 +26,7 @@ export function CountySpotlight() {
         const selected = shuffled.slice(0, 3).map(c => ({
             name: `${c.name} Snapshot`,
             status: c.fiscalHealth,
-            score: c.fiscalHealth === "Leader" ? "✅" : (c.fiscalHealth === "Critical" ? "⚠️" : "🔍"),
+            score: c.fiscalHealth === "Leader" ? "" : (c.fiscalHealth === "Critical" ? "⚠️" : "🔍"),
             metrics: [
                 { label: "Absorption", value: c.absorption.split(' ')[0], trend: "up" },
                 { label: "Gap/Variance", value: c.budgetGap.includes('Pending') ? c.budgetGap.split(' ').slice(1, 3).join(' ') : c.budgetGap.split(' ')[0], trend: "down" }

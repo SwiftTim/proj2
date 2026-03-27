@@ -1,8 +1,5 @@
 -- Budget Transparency Database Schema - Enhanced for CBIRR Analysis
 
--- ============================================================================
--- CORE TABLES (Existing - Enhanced)
--- ============================================================================
 
 -- Table for tracking uploaded PDF files
 CREATE TABLE IF NOT EXISTS uploads (
@@ -35,9 +32,7 @@ CREATE TABLE IF NOT EXISTS analysis_results (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
--- NEW TABLES FOR CBIRR FEATURES
--- ============================================================================
+
 
 -- Document metadata for section-aware parsing
 CREATE TABLE IF NOT EXISTS document_metadata (
@@ -165,9 +160,6 @@ CREATE TABLE IF NOT EXISTS generated_reports (
 );
 
 
--- ============================================================================
--- INDEXES FOR PERFORMANCE
--- ============================================================================
 
 -- Existing indexes
 CREATE INDEX IF NOT EXISTS idx_uploads_county ON uploads(county);

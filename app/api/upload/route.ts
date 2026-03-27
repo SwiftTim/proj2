@@ -28,9 +28,15 @@ export async function POST(req: Request) {
     for (const file of files) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const filePath = path.join(uploadDir, file.name);
+
+      // Make filename unique to avoid collisions (e.g., multiple counties uploading "Budget.pdf")
+      const timestamp = Date.now();
+      const safeCounty = county.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const uniqueName = `${timestamp}-${safeCounty}-${file.name}`;
+
+      const filePath = path.join(uploadDir, uniqueName);
       await fs.writeFile(filePath, buffer);
-      savedFileNames.push(file.name);
+      savedFileNames.push(uniqueName);
     }
 
     // Save metadata to database

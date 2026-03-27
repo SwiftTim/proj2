@@ -19,14 +19,37 @@ def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Existing analysis_results table
+    # Core Table: Tracking uploaded PDF files (Required for Document List)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS uploads (
+            id SERIAL PRIMARY KEY,
+            county VARCHAR(100) NOT NULL,
+            year VARCHAR(10) NOT NULL,
+            filenames JSONB NOT NULL,
+            document_type VARCHAR(50) DEFAULT 'CBIRR',
+            file_size_bytes BIGINT,
+            upload_status VARCHAR(20) DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+    
+    # Enhanced Table: Analysis results (Joined with uploads)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS analysis_results (
             id SERIAL PRIMARY KEY,
-            county VARCHAR(100),
+            upload_id INTEGER REFERENCES uploads(id) ON DELETE CASCADE,
+            county VARCHAR(100) NOT NULL,
             year VARCHAR(10),
             summary_text TEXT,
-            key_metrics JSONB,
+            revenue JSONB,
+            expenditure JSONB,
+            debt_and_liabilities JSONB,
+            computed JSONB,
+            intelligence JSONB,
+            risk_score INTEGER,
+            project_performance JSONB,
+            raw_extracted JSONB,
             performance_rating VARCHAR(20),
             created_at TIMESTAMP DEFAULT NOW()
         );
@@ -58,15 +81,7 @@ def init_db():
         $$ language 'plpgsql';
     """)
 
-    cur.execute("""
-        DROP TRIGGER IF EXISTS update_user_roles_updated_at ON user_roles;
-        CREATE TRIGGER update_user_roles_updated_at
-        BEFORE UPDATE ON user_roles
-        FOR EACH ROW
-        EXECUTE FUNCTION update_updated_at_column();
-    """)
-
-    # New trending_merits table for daily hot takes (Enhanced)
+    # New trending_merits table for daily hot takes
     cur.execute("""
         CREATE TABLE IF NOT EXISTS trending_merits (
             id SERIAL PRIMARY KEY,
@@ -76,8 +91,8 @@ def init_db():
             keywords TEXT[],
             priority_score INTEGER DEFAULT 5,
             mapped_fields JSONB,
-            daily_audit JSONB, -- For the Comparison Bar Chart
-            economic_ticker JSONB, -- For the footer live ticker
+            daily_audit JSONB, 
+            economic_ticker JSONB,
             raw_gemini_response JSONB,
             created_at TIMESTAMP DEFAULT NOW()
         );
@@ -89,22 +104,13 @@ def init_db():
         ON trending_merits(date DESC);
     """)
     
-    # System settings for global constants (Budget figures, etc.)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS system_settings (
-            key VARCHAR(255) PRIMARY KEY,
-            value JSONB,
-            updated_at TIMESTAMP DEFAULT NOW()
-        );
-    """)
-
-    # User Feedback for the "Intelligence Feedback Loop"
+    # User Feedback
     cur.execute("""
         CREATE TABLE IF NOT EXISTS user_feedback (
             id SERIAL PRIMARY KEY,
             user_email VARCHAR(255),
             rating INTEGER,
-            category VARCHAR(50), -- 'quality', 'speed', 'accuracy', 'other'
+            category VARCHAR(50), 
             comment TEXT,
             analysis_id INTEGER,
             created_at TIMESTAMP DEFAULT NOW()
@@ -114,3 +120,4 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
+    print("✅ Database tables initialized successfully")

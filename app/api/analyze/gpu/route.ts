@@ -41,15 +41,25 @@ export async function POST(req: Request) {
         // 2. Save to database
         const client = await pool.connect()
         try {
-            // Find upload_id by filename
+            // Find upload_id by filename AND county/year for maximum precision
             const uploadRes = await client.query(
-                "SELECT id FROM uploads WHERE filenames @> $1 LIMIT 1",
-                [JSON.stringify([pdfId])]
+                "SELECT id FROM uploads WHERE filenames @> $1 AND county = $2 AND year = $3 LIMIT 1",
+                [JSON.stringify([pdfId]), county, year]
             )
-            const upload_id = uploadRes.rows[0]?.id
+
+            let upload_id = uploadRes.rows[0]?.id
 
             if (!upload_id) {
-                console.warn(`⚠️ Could not find upload record for filename: ${pdfId}`)
+                console.warn(`⚠️ Could not find precise upload record for [${pdfId}, ${county}, ${year}]. Falling back to filename only...`)
+                const fallbackRes = await client.query(
+                    "SELECT id FROM uploads WHERE filenames @> $1 LIMIT 1",
+                    [JSON.stringify([pdfId])]
+                )
+                upload_id = fallbackRes.rows[0]?.id
+            }
+
+            if (!upload_id) {
+                console.error(`❌ Critical: Could not find upload record for filename: ${pdfId}`)
             }
 
             // Unified Mapping for DB
@@ -58,25 +68,30 @@ export async function POST(req: Request) {
             const summary_text = interpreted.summary_text || "No summary generated."
             const raw_extracted = result.raw_verified_data || result.metadata?.raw_markdown || {}
 
+            // Prefer the county name from the AI if it detected it, but default to the request county
+            const finalCounty = interpreted.county || county;
+            const finalYear = interpreted.year || year;
+
             // Check if analysis already exists
             const existingAnalysis = await client.query(
                 "SELECT id FROM analysis_results WHERE upload_id = $1 AND county = $2 LIMIT 1",
-                [upload_id, county]
+                [upload_id, finalCounty]
             )
 
             if (existingAnalysis.rows.length > 0) {
                 // Update
                 const updateRes = await client.query(
                     `UPDATE analysis_results SET 
-              revenue = $1, expenditure = $2, intelligence = $3, summary_text = $4, raw_extracted = $5, year = $6, created_at = CURRENT_TIMESTAMP
-             WHERE id = $7 RETURNING id`,
+              revenue = $1, expenditure = $2, intelligence = $3, summary_text = $4, raw_extracted = $5, county = $6, year = $7, created_at = CURRENT_TIMESTAMP
+             WHERE id = $8 RETURNING id`,
                     [
                         JSON.stringify(keyMetrics),
                         JSON.stringify(interpreted.sectoral_allocations || {}),
                         JSON.stringify(intelligence),
                         summary_text,
                         JSON.stringify(raw_extracted),
-                        year,
+                        finalCounty,
+                        finalYear,
                         existingAnalysis.rows[0].id
                     ]
                 )
@@ -91,8 +106,8 @@ export async function POST(req: Request) {
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
                     [
                         upload_id,
-                        county,
-                        year,
+                        finalCounty,
+                        finalYear,
                         JSON.stringify(keyMetrics),
                         JSON.stringify(interpreted.sectoral_allocations || {}),
                         JSON.stringify(intelligence),

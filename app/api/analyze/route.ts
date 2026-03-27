@@ -31,15 +31,20 @@ export async function POST(req: Request) {
       // 2. Save results to database
       const client = await pool.connect()
       try {
-        // Find upload_id
+        // Find upload_id by county, year AND filename (forwarded as data.filename or from the file object)
+        // Note: The file's name might have been changed in the upload process, but here we're receiving the raw file.
+        // We'll try to find the upload by county and year primarily.
         const uploadRes = await client.query(
-          "SELECT id FROM uploads WHERE county = $1 AND year = $2 LIMIT 1",
+          "SELECT id FROM uploads WHERE county = $1 AND year = $2 ORDER BY created_at DESC LIMIT 1",
           [county, year]
         )
         const upload_id = uploadRes.rows[0]?.id
 
         const interpreted = data.interpreted_data || data
         const raw_verified = data.raw_verified_data || null
+
+        const finalCounty = interpreted.county || county;
+        const finalYear = interpreted.year || year;
 
         await client.query(
           `INSERT INTO analysis_results (
@@ -49,8 +54,8 @@ export async function POST(req: Request) {
           ON CONFLICT DO NOTHING`,
           [
             upload_id,
-            county,
-            year,
+            finalCounty,
+            finalYear,
             JSON.stringify(interpreted.key_metrics || {}),
             JSON.stringify(interpreted.sectoral_allocations || {}),
             JSON.stringify(interpreted.intelligence || {}),

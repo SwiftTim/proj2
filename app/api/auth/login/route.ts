@@ -12,6 +12,7 @@ const hashPassword = (password: string) => {
 }
 
 export async function POST(req: Request) {
+    let client;
     try {
         const { email, password } = await req.json()
 
@@ -23,16 +24,14 @@ export async function POST(req: Request) {
             })
         }
 
-        const client = await pool.connect()
+        client = await pool.connect()
         const passHash = hashPassword(password)
 
         const result = await client.query(`
-      SELECT user_id, username as name, email, role 
-      FROM user_roles 
-      WHERE email = $1 AND password_hash = $2
-    `, [email, passHash])
-
-        client.release()
+            SELECT user_id, username as name, email, role 
+            FROM user_roles 
+            WHERE email = $1 AND password_hash = $2
+        `, [email, passHash])
 
         if (result.rows.length === 0) {
             return NextResponse.json({ success: false, error: "Invalid email or password." }, { status: 401 })
@@ -41,6 +40,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, user: result.rows[0] })
     } catch (err: any) {
         console.error("Login Error:", err)
-        return NextResponse.json({ success: false, error: err.message }, { status: 500 })
+        return NextResponse.json({ success: false, error: "Database connection failed. Please check if PostgreSQL is running." }, { status: 500 })
+    } finally {
+        if (client) client.release()
     }
 }
