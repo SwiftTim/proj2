@@ -67,7 +67,7 @@ export function UploadModule() {
     setProcessingStep("Uploading to server...")
 
     try {
-      // STEP 1: Send file DIRECTLY to Render Python backend (bypasses Vercel's 4.5MB limit)
+      // STEP 1: Send files DIRECTLY to Render Python backend (bypasses Vercel's 4.5MB limit)
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://127.0.0.1:8000"
       const pyFormData = new FormData()
       pyFormData.append("county", county)
@@ -82,18 +82,22 @@ export function UploadModule() {
         body: pyFormData,
       })
 
+      if (!pyRes.ok) {
+        const errText = await pyRes.text()
+        throw new Error(`Upload failed: ${errText}`)
+      }
+
+      const pyData = await pyRes.json()
+      const uploadedNames: string[] = pyData.uploaded || files.map((f) => f.name)
+
       setProgress(70)
       setProcessingStep("Registering metadata in database...")
 
-      // STEP 2: Register metadata via Next.js API (small payload, no size issue)
-      const metaFormData = new FormData()
-      metaFormData.append("county", county)
-      metaFormData.append("year", year)
-      files.forEach((file) => metaFormData.append("files", file))
-
+      // STEP 2: Send ONLY filenames (no file bytes) to Vercel for DB registration
       const res = await fetch("/api/upload", {
         method: "POST",
-        body: metaFormData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ county, year, filenames: uploadedNames }),
       })
 
       const data = await res.json()
@@ -102,11 +106,11 @@ export function UploadModule() {
       if (data.success) {
         showSuccess("Upload complete", `${files.length} file(s) uploaded successfully`)
       } else {
-        showError("Server error", data.error || "Failed to upload")
+        showError("Server error", data.error || "Failed to register upload")
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Upload error:", err)
-      showError("Network error", "Could not reach server")
+      showError("Network error", err.message || "Could not reach server")
     }
 
     setUploading(false)
