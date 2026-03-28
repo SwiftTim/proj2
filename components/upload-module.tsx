@@ -66,18 +66,39 @@ export function UploadModule() {
     setProgress(10)
     setProcessingStep("Uploading to server...")
 
-    const formData = new FormData()
-    formData.append("county", county)
-    formData.append("year", year)
-    files.forEach((file) => formData.append("files", file))
-
     try {
+      // STEP 1: Send file DIRECTLY to Render Python backend (bypasses Vercel's 4.5MB limit)
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://127.0.0.1:8000"
+      const pyFormData = new FormData()
+      pyFormData.append("county", county)
+      pyFormData.append("year", year)
+      files.forEach((file) => pyFormData.append("files", file))
+
+      setProgress(30)
+      setProcessingStep("Transferring files to analysis server...")
+
+      const pyRes = await fetch(`${backendUrl}/upload`, {
+        method: "POST",
+        body: pyFormData,
+      })
+
+      setProgress(70)
+      setProcessingStep("Registering metadata in database...")
+
+      // STEP 2: Register metadata via Next.js API (small payload, no size issue)
+      const metaFormData = new FormData()
+      metaFormData.append("county", county)
+      metaFormData.append("year", year)
+      files.forEach((file) => metaFormData.append("files", file))
+
       const res = await fetch("/api/upload", {
         method: "POST",
-        body: formData,
+        body: metaFormData,
       })
 
       const data = await res.json()
+      setProgress(100)
+
       if (data.success) {
         showSuccess("Upload complete", `${files.length} file(s) uploaded successfully`)
       } else {

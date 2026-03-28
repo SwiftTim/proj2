@@ -50,6 +50,33 @@ def root():
         "usage": "POST /analyze_pdf with 'file' (PDF), 'county' (string), and 'method' (local|ai)"
     }
 
+@app.post("/upload")
+async def upload_files(
+    county: str = Form(...),
+    year: str = Form(...),
+    files: List[UploadFile] = File(...)
+):
+    """
+    Receives PDF files directly from the browser (bypasses Vercel's 4.5MB limit).
+    Saves files to the public/uploads directory on Render for later analysis.
+    """
+    upload_dir = os.path.join(os.path.dirname(__file__), "../../public/uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    saved = []
+    for file in files:
+        timestamp = int(__import__('time').time() * 1000)
+        safe_county = county.replace(" ", "_").lower()
+        unique_name = f"{timestamp}-{safe_county}-{file.filename}"
+        file_path = os.path.join(upload_dir, unique_name)
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        saved.append(unique_name)
+        print(f"✅ Saved uploaded file: {unique_name}")
+
+    return {"success": True, "uploaded": saved}
+
 class GPUAnalysisRequest(BaseModel):
     pdf_id: str
     county: str
