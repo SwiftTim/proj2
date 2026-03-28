@@ -33,13 +33,18 @@ app = FastAPI(
     version="2.3.0"
 )
 
-# Enable CORS for your Next.js frontend
+# Enable strict CORS for the Next.js frontend to prevent cross-site request forgery attacks
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://proj2-omega.vercel.app",
+        # Allow Vercel preview branch deployments
+        "https://proj2-git-main-wambuat197-6421s-projects.vercel.app"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 
@@ -202,12 +207,22 @@ async def gemini_analysis_endpoint(
     try:
         # Resolve PDF Path
         if not os.path.exists(request.pdf_id):
-             possible_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../public/uploads", request.pdf_id))
+             upload_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../public/uploads"))
+             possible_path = os.path.join(upload_dir, request.pdf_id)
              if os.path.exists(possible_path):
                  print(f"📂 Found PDF at resolved path: {possible_path}")
                  request.pdf_id = possible_path
              else:
                  print(f"⚠️ PDF not found at {request.pdf_id} or {possible_path}")
+                 if os.path.exists(upload_dir):
+                     print(f"📂 Contents of {upload_dir}: {os.listdir(upload_dir)}")
+                     
+                 # Let's try to find any file that contains the requested pdf_id just in case of encoding issues
+                 for f in os.listdir(upload_dir):
+                     if request.pdf_id.replace("%20", " ") in f or f in request.pdf_id:
+                         request.pdf_id = os.path.join(upload_dir, f)
+                         print(f"🔍 Found fuzzy match: {request.pdf_id}")
+                         break
 
         # Run the pipeline
         result = await processor.process(
