@@ -1,9 +1,10 @@
-
 import { NextResponse } from "next/server"
+
+export const dynamic = "force-dynamic"
 
 // This is a temporary storage for terminal logs. 
 // In a real production environment, this would be served from a log aggregator or a real-time TTY bridge.
-let terminalLogs = {
+let terminalLogs: Record<string, string[]> = {
     npm: [
         "✓ Compiled in 15.6s (3532 modules)",
         "GET /api/documents 200 in 6679ms",
