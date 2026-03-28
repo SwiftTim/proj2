@@ -68,7 +68,10 @@ export function UploadModule() {
 
     try {
       // STEP 1: Send files DIRECTLY to Render Python backend (bypasses Vercel's 4.5MB limit)
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://127.0.0.1:8000"
+      const backendUrl = process.env.NODE_ENV === "production"
+        ? "https://proj2-khot.onrender.com"
+        : "http://127.0.0.1:8000";
+
       const pyFormData = new FormData()
       pyFormData.append("county", county)
       pyFormData.append("year", year)
