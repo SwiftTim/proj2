@@ -119,6 +119,38 @@ def init_db():
         );
     """)
 
+    # Audit Logs
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id SERIAL PRIMARY KEY,
+            action VARCHAR(255),
+            details TEXT,
+            service VARCHAR(50),
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
+
+    # Generated Reports
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS generated_reports (
+            id SERIAL PRIMARY KEY,
+            report_type VARCHAR(100),
+            county VARCHAR(100),
+            format VARCHAR(10),
+            file_url TEXT,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
+
+    # System Settings
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS system_settings (
+            key VARCHAR(100) PRIMARY KEY,
+            value JSONB,
+            updated_at TIMESTAMP DEFAULT NOW()
+        );
+    """)
+
     conn.commit()
     cur.close()
     conn.close()
