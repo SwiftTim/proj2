@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { Pool } from "pg"
+import { BACKEND_API_URL } from "@/lib/api-config"
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
         console.log(`🌟 Forwarding Gemini Analysis for ${county} (PDF: ${pdfId}) to Python service...`)
 
         // 1. Call Python service
-        const response = await fetch('http://127.0.0.1:8000/analyze/gemini', {
+        const response = await fetch(`${BACKEND_API_URL}/analyze/gemini`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

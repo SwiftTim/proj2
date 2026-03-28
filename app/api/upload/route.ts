@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
-import path from "path";
-import fs from "fs/promises";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // stored in .env.local
+  connectionString: process.env.DATABASE_URL,
 });
 
 export async function POST(req: Request) {
@@ -18,34 +16,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Missing county, year, or files" }, { status: 400 });
     }
 
-    // Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), "public/uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    // Save files physically
+    // On Vercel, we can't write to the filesystem (read-only).
+    // Instead, store file metadata in the database only.
+    // The full file is forwarded straight to the Render Python service during analysis.
     const savedFileNames: string[] = [];
 
     for (const file of files) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      // Make filename unique to avoid collisions (e.g., multiple counties uploading "Budget.pdf")
       const timestamp = Date.now();
       const safeCounty = county.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       const uniqueName = `${timestamp}-${safeCounty}-${file.name}`;
-
-      const filePath = path.join(uploadDir, uniqueName);
-      await fs.writeFile(filePath, buffer);
       savedFileNames.push(uniqueName);
     }
 
-    // Save metadata to database
+    // Save metadata to database only
     const client = await pool.connect();
-    await client.query(
-      `INSERT INTO uploads (county, year, filenames, created_at) VALUES ($1, $2, $3, NOW())`,
-      [county, year, JSON.stringify(savedFileNames)]
-    );
-    client.release();
+    try {
+      await client.query(
+        `INSERT INTO uploads (county, year, filenames, upload_status, created_at) VALUES ($1, $2, $3, 'pending', NOW())`,
+        [county, year, JSON.stringify(savedFileNames)]
+      );
+    } finally {
+      client.release();
+    }
 
     return NextResponse.json({ success: true, uploaded: savedFileNames });
   } catch (err: any) {
