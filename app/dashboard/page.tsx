@@ -126,26 +126,26 @@ export default function DashboardPage() {
         {/* Header */}
         <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-40">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center space-x-4 justify-between md:justify-start">
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/" aria-label="Go to Home page">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Home
+                    <ArrowLeft className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:inline">Home</span>
                   </Link>
                 </Button>
                 <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-8 w-8 text-accent" aria-hidden="true" />
+                  <BarChart3 className="h-6 w-6 md:h-8 md:w-8 text-accent" aria-hidden="true" />
                   <div>
-                    <h1 className="text-2xl font-bold text-foreground font-plus-jakarta">BudgetAI Dashboard</h1>
-                    <p className="text-sm text-muted-foreground">National Fiscal Transparency Engine</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-foreground font-plus-jakarta">BudgetAI Dashboard</h1>
+                    <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">National Fiscal Transparency Engine</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 md:space-x-6 w-full md:w-auto mt-4 md:mt-0">
                 <NationalBudgetHeader />
-                <div className="h-8 w-px bg-border mx-2" />
+                <div className="hidden sm:block h-8 w-px bg-border mx-2" />
                 {user ? (
                   <div className="flex items-center space-x-3">
                     <div className="text-right">
@@ -212,19 +212,19 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="dashboard" className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-3xl font-bold text-foreground">Budget Overview</h2>
-                  <p className="text-muted-foreground">Unified audit of national and county fiscal performance</p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Budget Overview</h2>
+                  <p className="text-sm md:text-base text-muted-foreground">Unified audit of national and county fiscal performance</p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
+                <div className="flex items-center space-x-2 w-full md:w-auto">
+                  <div className="relative w-full md:w-auto">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     <Input
                       placeholder="Search counties…"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 w-64"
+                      className="pl-10 w-full md:w-64"
                       autoComplete="off"
                       aria-label="Search counties"
                     />

@@ -121,15 +121,15 @@ export function ComparisonModule() {
     return (
         <Card className="max-w-6xl mx-auto border-neutral-800 bg-black/40 backdrop-blur-xl shadow-2xl">
             <CardHeader className="border-b border-white/5 bg-white/5">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
                     <div>
-                        <CardTitle className="text-white text-2xl font-black tracking-tight">Financial Comparison Suite</CardTitle>
+                        <CardTitle className="text-white text-xl md:text-2xl font-black tracking-tight">Financial Comparison Suite</CardTitle>
                         <CardDescription className="text-neutral-400">Cross-reference budget data and verify integrity.</CardDescription>
                     </div>
-                    <Tabs value={activeMode} onValueChange={setActiveMode} className="bg-neural-900/50 p-1 rounded-full border border-neutral-800">
-                        <TabsList className="bg-transparent">
-                            <TabsTrigger value="push_compare" className="rounded-full px-6 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">PDF Push & Compare</TabsTrigger>
-                            <TabsTrigger value="county_vs_county" className="rounded-full px-6 data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Benchmarking</TabsTrigger>
+                    <Tabs value={activeMode} onValueChange={setActiveMode} className="bg-neural-900/50 p-1 rounded-full border border-neutral-800 self-start lg:self-auto overflow-x-auto w-full md:w-auto">
+                        <TabsList className="bg-transparent flex flex-nowrap min-w-max">
+                            <TabsTrigger value="push_compare" className="rounded-full px-4 md:px-6 data-[state=active]:bg-indigo-600 data-[state=active]:text-white whitespace-nowrap">PDF Push & Compare</TabsTrigger>
+                            <TabsTrigger value="county_vs_county" className="rounded-full px-4 md:px-6 data-[state=active]:bg-indigo-600 data-[state=active]:text-white whitespace-nowrap">Benchmarking</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>

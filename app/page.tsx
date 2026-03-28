@@ -84,7 +84,7 @@ export default function LandingPage() {
                 Budget<span className="text-red-500">KE</span> <span className="text-slate-500 text-sm font-medium ml-1">v2.1</span>
               </span>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-8">
               <Link href="#impact" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">
                 Impact
               </Link>
@@ -95,11 +95,13 @@ export default function LandingPage() {
                 Why BudgetAI
               </Link>
               <div className="h-4 w-[1px] bg-slate-800" />
-              <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-white/5" asChild>
+            </div>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <Button variant="ghost" size="sm" className="hidden sm:flex text-slate-300 hover:text-white hover:bg-white/5" asChild>
                 <Link href="/dashboard">Sign In</Link>
               </Button>
-              <Button size="sm" className="bg-red-600 hover:bg-red-500 text-white border-none shadow-lg shadow-red-900/20 px-6" asChild>
-                <Link href="/dashboard">Get Started</Link>
+              <Button size="sm" className="bg-red-600 hover:bg-red-500 text-white border-none shadow-lg shadow-red-900/20 px-4 md:px-6" asChild>
+                <Link href="/dashboard">App <span className="hidden sm:inline ml-1">Dashboard</span></Link>
               </Button>
             </div>
           </div>

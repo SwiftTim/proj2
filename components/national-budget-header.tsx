@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 
 export function NationalBudgetHeader() {
     return (
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-center sm:items-end gap-1">
             <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">National Budget</span>
                 <Badge variant="outline" className="text-lg py-1 px-4 border-accent/30 bg-accent/5 text-accent font-bold ring-1 ring-accent/20">
