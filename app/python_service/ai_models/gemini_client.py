@@ -9,10 +9,11 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../../.env.loca
 
 class GeminiClient:
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("gemini")
-        if not api_key:
+        raw_key = os.getenv("GOOGLE_API_KEY") or os.getenv("gemini")
+        if not raw_key:
             raise ValueError("GOOGLE_API_KEY or gemini not found in environment variables")
         
+        api_key = raw_key.strip()
         genai.configure(api_key=api_key)
         # Use the latest Gemini 2.5 Flash as verified by the user
         self.model = genai.GenerativeModel("gemini-2.5-flash")

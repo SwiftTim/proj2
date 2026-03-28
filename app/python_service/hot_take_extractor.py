@@ -20,11 +20,11 @@ class HotTakeExtractor:
     """
     
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("gemini")
-        if not api_key:
+        raw_key = os.getenv("GOOGLE_API_KEY") or os.getenv("gemini")
+        if not raw_key:
             raise ValueError("GOOGLE_API_KEY or gemini not found in environment variables")
         
-        genai.configure(api_key=api_key)
+        genai.configure(api_key=raw_key.strip())
         self.model = genai.GenerativeModel("gemini-2.5-flash")
     
     async def extract_daily_hot_takes(self) -> Dict:
