@@ -21,13 +21,22 @@ export function LiveTicker() {
       const res = await fetch("/api/landing-data")
       const data = await res.json()
       if (data.success && data.trending?.ticker?.length > 0) {
-        const tickerAlerts = data.trending.ticker.map((t: any) => ({
-          type: (t.type || "INFO").toUpperCase(),
-          message: t.text,
-          color: getAlertColor(t.health || "stable")
-        }))
+        const tickerAlerts = data.trending.ticker.map((t: any) => {
+          if (typeof t === 'string') {
+            return {
+              type: "INFO",
+              message: t,
+              color: getAlertColor("stable")
+            }
+          }
+          return {
+            type: (t.type || "INFO").toUpperCase(),
+            message: t.text || t.message || "",
+            color: getAlertColor(t.health || "stable")
+          }
+        })
         setAlerts(tickerAlerts)
-        return
+        return;
       }
     } catch (err) {
       console.error("Ticker fetch error:", err)

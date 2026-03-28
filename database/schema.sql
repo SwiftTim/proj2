@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS analysis_results (
     intelligence JSONB,
     summary_text TEXT,
     risk_score INTEGER,
+    total_allocation BIGINT,
+    risk_level VARCHAR(20),
     project_performance JSONB,
     raw_extracted JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

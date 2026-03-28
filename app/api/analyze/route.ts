@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { Pool } from "pg"
+import { BACKEND_API_URL } from "@/lib/api-config"
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
     pyForm.append("file", file)
     pyForm.append("method", method || "hybrid")
 
-    const res = await fetch("http://localhost:8000/analyze_pdf", {
+    const res = await fetch(`${BACKEND_API_URL}/analyze_pdf`, {
       method: "POST",
       body: pyForm,
     })
@@ -49,8 +50,9 @@ export async function POST(req: Request) {
         await client.query(
           `INSERT INTO analysis_results (
             upload_id, county, year, revenue, expenditure, 
-            intelligence, summary_text, raw_extracted
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            intelligence, summary_text, raw_extracted,
+            total_allocation, risk_level, risk_score
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
           ON CONFLICT DO NOTHING`,
           [
             upload_id,
@@ -60,7 +62,10 @@ export async function POST(req: Request) {
             JSON.stringify(interpreted.sectoral_allocations || {}),
             JSON.stringify(interpreted.intelligence || {}),
             interpreted.summary_text,
-            JSON.stringify(raw_verified)
+            JSON.stringify(raw_verified),
+            interpreted.key_metrics?.total_budget || 0,
+            interpreted.intelligence?.verdict || 'Unknown',
+            interpreted.intelligence?.risk_score || 0
           ]
         )
 
