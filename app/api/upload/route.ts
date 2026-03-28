@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
+// Disable Next.js body size limit for this route to allow large PDF uploads
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "100mb",
+    },
+  },
+};
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
