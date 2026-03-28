@@ -1,23 +1,23 @@
-# AI Budget Transparency Platform
+# 🚀 AI Budget Transparency Platform
 
-> Live Production Environment: [https://proj2-omega.vercel.app/dashboard](https://proj2-omega.vercel.app/dashboard)
+> 🔴 **Live Production Environment:** [https://proj2-omega.vercel.app/dashboard](https://proj2-omega.vercel.app/dashboard)
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
 This platform implements a distributed, hybrid machine learning service designed to extract structured fiscal intelligence from raw, unstructured County Budget Implementation Review Reports (CBIRR). It operates using a bifurcated architectural design:
 
-1.  **Frontend Interface (Vercel Serverless Application):** Built on Next.js 14 (App Router) using React Server Components, customized UI tokens, and dynamic fetching.
-2.  **Machine Learning Operations Backend (Render API Instance):** A high-performance FastAPI Python application responsible for document orchestration, NLP inference, and scheduled data extraction.
-3.  **PostgreSQL Data Sink (Neon Serverless):** Centralized Relational Database handling state, user roles, file metadata, and analysis blobs.
+1.  **💻 Frontend Interface (Vercel Serverless Application):** Built on Next.js 14 (App Router) using React Server Components, customized UI tokens, and dynamic fetching.
+2.  **⚙️ Machine Learning Operations Backend (Render API Instance):** A high-performance FastAPI Python application responsible for document orchestration, NLP inference, and scheduled data extraction.
+3.  **🗄️ PostgreSQL Data Sink (Neon Serverless):** Centralized Relational Database handling state, user roles, file metadata, and analysis blobs.
 
-## Core Security Implementations
+## 🛡️ Core Security Implementations
 
-*   **Strict CORS Policy:** The Python backend is explicitly restricted to accept requests originating only from verified Vercel origins (`https://proj2-omega.vercel.app`), mitigating Cross-Site Request Forgery (CSRF). 
-*   **Next.js Security Headers:** HTTP response headers enforce strict policies, including `Strict-Transport-Security` (max-age 63072000), `X-Frame-Options` (Clickjacking prevention), and `X-Content-Type-Options` (MIME sniffing prevention).
-*   **Offloaded Payload processing:** Implemented dual-upload streams bypassing serverless memory limits, pushing raw unverified blobs directly to Python isolation containers instead of passing them through the Edge Nodes.
-*   **Sanitized Generative API Parameters:** The AI models process text streams rather than executing commands, keeping the LLM strictly within boundary inference.
+*   **🔒 Strict CORS Policy:** The Python backend is explicitly restricted to accept requests originating only from verified Vercel origins (`https://proj2-omega.vercel.app`), mitigating Cross-Site Request Forgery (CSRF). 
+*   **🛡️ Next.js Security Headers:** HTTP response headers enforce strict policies, including `Strict-Transport-Security` (max-age 63072000), `X-Frame-Options` (Clickjacking prevention), and `X-Content-Type-Options` (MIME sniffing prevention).
+*   **📦 Offloaded Payload processing:** Implemented dual-upload streams bypassing serverless memory limits, pushing raw unverified blobs directly to Python isolation containers instead of passing them through the Edge Nodes.
+*   **🧠 Sanitized Generative API Parameters:** The AI models process text streams rather than executing commands, keeping the LLM strictly within boundary inference.
 
-## Primary System Workflows
+## 🔄 Primary System Workflows
 
 ```mermaid
 graph TD;

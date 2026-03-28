@@ -126,24 +126,24 @@ export default function DashboardPage() {
         {/* Header */}
         <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-40">
           <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center space-x-4 justify-between md:justify-start">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center space-x-4 justify-between sm:justify-start shrink-0">
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/" aria-label="Go to Home page">
-                    <ArrowLeft className="h-4 w-4 md:mr-2" />
-                    <span className="hidden md:inline">Home</span>
+                    <ArrowLeft className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Home</span>
                   </Link>
                 </Button>
-                <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-6 w-6 md:h-8 md:w-8 text-accent" aria-hidden="true" />
-                  <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-foreground font-plus-jakarta">BudgetAI Dashboard</h1>
-                    <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">National Fiscal Transparency Engine</p>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-accent shrink-0" aria-hidden="true" />
+                  <div className="shrink-0">
+                    <h1 className="text-xl sm:text-2xl font-bold text-foreground font-plus-jakarta whitespace-nowrap">BudgetAI Dashboard</h1>
+                    <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">National Fiscal Transparency Engine</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 md:space-x-6 w-full md:w-auto mt-4 md:mt-0">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:space-x-4 lg:space-x-6 w-full sm:w-auto mt-4 sm:mt-0 overflow-x-auto">
                 <NationalBudgetHeader />
                 <div className="hidden sm:block h-8 w-px bg-border mx-2" />
                 {user ? (
